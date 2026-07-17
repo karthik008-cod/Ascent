@@ -13,9 +13,9 @@ extension GetMissionCollection on Isar {
   IsarCollection<Mission> get missions => this.collection();
 }
 
-const MissionSchema = CollectionSchema(
+final MissionSchema = CollectionSchema(
   name: r'Mission',
-  id: -354283831371309,
+  id: identical(0, 0.0) ? -35428383 : BigInt.parse('-3542838313713095933').toInt(),
   properties: {
     r'date': PropertySchema(
       id: 0,

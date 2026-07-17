@@ -13,9 +13,9 @@ extension GetUserStatsCollection on Isar {
   IsarCollection<UserStats> get userStats => this.collection();
 }
 
-const UserStatsSchema = CollectionSchema(
+final UserStatsSchema = CollectionSchema(
   name: r'UserStats',
-  id: 371898716828931,
+  id: identical(0, 0.0) ? 37189871 : BigInt.parse('3718987168289318233').toInt(),
   properties: {
     r'currentLevel': PropertySchema(
       id: 0,
