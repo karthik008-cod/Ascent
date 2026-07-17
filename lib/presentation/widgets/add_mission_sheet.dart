@@ -31,6 +31,8 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
   
   // Reminders & Tags
   TimeOfDay? _reminderTime;
+  bool _syncReminderWithMissionRepeat = true;
+  String _reminderRepeatMode = 'Once';
   final Set<String> _selectedTags = {};
   final List<String> _availableTags = ['#Career', '#Fitness', '#Mindset', '#Project', '#Personal'];
 
@@ -63,6 +65,14 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
             _repeatMode = line.substring(9);
           } else if (line.startsWith('Reminder: ')) {
             // keep noted
+          } else if (line.startsWith('Reminder Repeat: ')) {
+            final mode = line.substring(17).trim();
+            if (mode == 'Synced') {
+              _syncReminderWithMissionRepeat = true;
+            } else {
+              _syncReminderWithMissionRepeat = false;
+              _reminderRepeatMode = mode;
+            }
           } else if (line != 'Subtasks:') {
             notesLines.add(line);
           }
@@ -177,10 +187,20 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
     }
     if (_reminderTime != null) {
       buffer.writeln('\nReminder: ${_reminderTime!.format(context)}');
+      final repeatStr = _syncReminderWithMissionRepeat && _repeatMode != 'Never'
+          ? 'Synced'
+          : (_syncReminderWithMissionRepeat ? 'Once' : _reminderRepeatMode);
+      buffer.writeln('Reminder Repeat: $repeatStr');
     }
     if (_selectedTags.isNotEmpty) {
       buffer.writeln('\nTags: ${_selectedTags.join(' ')}');
     }
+
+    final actualRepeatMode = _syncReminderWithMissionRepeat
+        ? (_repeatMode == 'Daily' || _repeatMode == 'Custom Days'
+            ? 'Daily'
+            : (_repeatMode == 'Weekly' ? 'Weekly' : 'Once'))
+        : _reminderRepeatMode;
 
     if (widget.existingMission != null) {
       final mission = widget.existingMission!
@@ -197,7 +217,10 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
           title: 'Ascent Reminder: ${mission.title}',
           body: 'It is time to focus on your mission!',
           scheduledTime: _reminderTime!,
+          repeatMode: actualRepeatMode,
         );
+      } else {
+        NotificationService.cancelNotification(mission.id);
       }
     } else {
       final mission = Mission()
@@ -215,6 +238,7 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
           title: 'Ascent Reminder: ${mission.title}',
           body: 'It is time to focus on your mission!',
           scheduledTime: _reminderTime!,
+          repeatMode: actualRepeatMode,
         );
       }
     }
@@ -600,6 +624,102 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
                       ),
                     ],
                   ),
+                  if (_reminderTime != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.primary.withOpacity(0.4)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Sync with Mission Repeat', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                                    SizedBox(height: 2),
+                                    Text('Repeat reminder along with mission schedule', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                                  ],
+                                ),
+                              ),
+                              Switch(
+                                value: _syncReminderWithMissionRepeat,
+                                activeThumbColor: AppColors.primary,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _syncReminderWithMissionRepeat = val;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          if (!_syncReminderWithMissionRepeat) ...[
+                            const Divider(height: 18, color: AppColors.surfaceHighlight),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Reminder Repetition:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surface,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: AppColors.surfaceHighlight),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      value: _reminderRepeatMode,
+                                      isDense: true,
+                                      dropdownColor: AppColors.surface,
+                                      icon: const Icon(Icons.arrow_drop_down_rounded, color: AppColors.primary),
+                                      items: ['Once', 'Daily', 'Weekly', 'Hourly (Nag)'].map((mode) {
+                                        return DropdownMenuItem(
+                                          value: mode,
+                                          child: Text(mode, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                        );
+                                      }).toList(),
+                                      onChanged: (val) {
+                                        if (val != null) {
+                                          setState(() {
+                                            _reminderRepeatMode = val;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ] else if (_repeatMode != 'Never') ...[
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(Icons.sync_rounded, size: 14, color: AppColors.primary),
+                                const SizedBox(width: 6),
+                                Text('Repeats: $_repeatMode at ${_reminderTime!.format(context)}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary)),
+                              ],
+                            ),
+                          ] else ...[
+                            const SizedBox(height: 4),
+                            const Row(
+                              children: [
+                                Icon(Icons.info_outline_rounded, size: 14, color: AppColors.textSecondary),
+                                SizedBox(width: 6),
+                                Text('Mission does not repeat (Reminder fires once)', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,

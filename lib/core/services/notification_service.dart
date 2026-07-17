@@ -73,6 +73,7 @@ class NotificationService {
     required String title,
     required String body,
     required TimeOfDay scheduledTime,
+    String repeatMode = 'Once',
   }) async {
     await init();
 
@@ -87,6 +88,13 @@ class NotificationService {
 
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    DateTimeComponents? matchComponents;
+    if (repeatMode == 'Daily' || repeatMode == 'Hourly (Nag)') {
+      matchComponents = DateTimeComponents.time;
+    } else if (repeatMode == 'Weekly') {
+      matchComponents = DateTimeComponents.dayOfWeekAndTime;
     }
 
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
@@ -110,6 +118,7 @@ class NotificationService {
         platformDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: matchComponents,
       );
     } catch (e) {
       // Fallback to inexact if exact alarm permission is not granted yet
@@ -121,6 +130,7 @@ class NotificationService {
         platformDetails,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: matchComponents,
       );
     }
   }
