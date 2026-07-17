@@ -134,144 +134,144 @@ class FilterSortBar extends ConsumerWidget {
             return SafeArea(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Handle Bar & Title
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceHighlight,
-                          borderRadius: BorderRadius.circular(2),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Handle Bar & Title
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceHighlight,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Filter Missions',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        if (currentFilter != 'All')
-                          TextButton(
-                            onPressed: () {
-                              ref.read(missionFilterProvider.notifier).state = 'All';
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              'Reset (All)',
-                              style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Filter Missions',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
                             ),
                           ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'BY MISSION TYPE',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            letterSpacing: 1.5,
-                            color: AppColors.textSecondary,
-                          ),
-                    ),
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: ['All', 'Main', 'Side', 'Routine'].map((type) {
-                        final isSelected = currentFilter == type;
-                        return GestureDetector(
-                          onTap: () {
-                            ref.read(missionFilterProvider.notifier).state = type;
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: isSelected ? AppColors.primary : AppColors.background,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: isSelected ? AppColors.primary : AppColors.surfaceHighlight,
+                          if (currentFilter != 'All')
+                            TextButton(
+                              onPressed: () {
+                                ref.read(missionFilterProvider.notifier).state = 'All';
+                                Navigator.pop(context);
+                              },
+                              child: const Text(
+                                'Reset (All)',
+                                style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                               ),
                             ),
-                            child: Text(
-                              type,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                color: isSelected ? Colors.white : AppColors.textSecondary,
-                              ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'BY MISSION TYPE',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              letterSpacing: 1.5,
+                              color: AppColors.textSecondary,
                             ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'BY HASHTAG',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            letterSpacing: 1.5,
-                            color: AppColors.textSecondary,
-                          ),
-                    ),
-                    const SizedBox(height: 10),
-                    if (availableHashtags.isEmpty)
-                      const Text(
-                        'No hashtags found in your missions yet.',
-                        style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
-                      )
-                    else
+                      ),
+                      const SizedBox(height: 10),
                       Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: availableHashtags.map((tag) {
-                          final isSelected = currentFilter == tag;
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: ['All', 'Main', 'Side', 'Routine'].map((type) {
+                          final isSelected = currentFilter == type;
                           return GestureDetector(
                             onTap: () {
-                              ref.read(missionFilterProvider.notifier).state = tag;
+                              ref.read(missionFilterProvider.notifier).state = type;
                               Navigator.pop(context);
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                               decoration: BoxDecoration(
-                                color: isSelected ? AppColors.secondary : AppColors.background,
-                                borderRadius: BorderRadius.circular(12),
+                                color: isSelected ? AppColors.primary : AppColors.background,
+                                borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: isSelected ? AppColors.secondary : AppColors.surfaceHighlight,
+                                  color: isSelected ? AppColors.primary : AppColors.surfaceHighlight,
                                 ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.tag_rounded,
-                                    size: 14,
-                                    color: isSelected ? Colors.white : AppColors.secondary,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    tag.startsWith('#') ? tag.substring(1) : tag,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                      color: isSelected ? Colors.white : AppColors.textPrimary,
-                                    ),
-                                  ),
-                                ],
+                              child: Text(
+                                type,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                                ),
                               ),
                             ),
                           );
                         }).toList(),
                       ),
-                  ],
+                      const SizedBox(height: 20),
+                      Text(
+                        'BY HASHTAG',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              letterSpacing: 1.5,
+                              color: AppColors.textSecondary,
+                            ),
+                      ),
+                      const SizedBox(height: 10),
+                      if (availableHashtags.isEmpty)
+                        const Text(
+                          'No hashtags found in your missions yet.',
+                          style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                        )
+                      else
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: availableHashtags.map((tag) {
+                            final isSelected = currentFilter == tag;
+                            return GestureDetector(
+                              onTap: () {
+                                ref.read(missionFilterProvider.notifier).state = tag;
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? AppColors.primary.withValues(alpha: 0.2) : AppColors.background,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isSelected ? AppColors.primary : AppColors.surfaceHighlight,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      '#$tag',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                        color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    if (isSelected) ...[
+                                      const SizedBox(width: 6),
+                                      const Icon(Icons.check_rounded, size: 14, color: AppColors.primary),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -296,6 +296,7 @@ class FilterSortBar extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.surface,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -303,90 +304,92 @@ class FilterSortBar extends ConsumerWidget {
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceHighlight,
-                      borderRadius: BorderRadius.circular(2),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceHighlight,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Sort Missions',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Sort Missions',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                ...sortOptions.map((opt) {
-                  final label = opt['label'] as String;
-                  final desc = opt['desc'] as String;
-                  final icon = opt['icon'] as IconData;
-                  final isSelected = currentSort == label;
+                  const SizedBox(height: 16),
+                  ...sortOptions.map((opt) {
+                    final label = opt['label'] as String;
+                    final desc = opt['desc'] as String;
+                    final icon = opt['icon'] as IconData;
+                    final isSelected = currentSort == label;
 
-                  return GestureDetector(
-                    onTap: () {
-                      ref.read(missionSortProvider.notifier).state = label;
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.secondary.withValues(alpha: 0.15) : AppColors.background,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isSelected ? AppColors.secondary : AppColors.surfaceHighlight,
+                    return GestureDetector(
+                      onTap: () {
+                        ref.read(missionSortProvider.notifier).state = label;
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.secondary.withValues(alpha: 0.15) : AppColors.background,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected ? AppColors.secondary : AppColors.surfaceHighlight,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              icon,
+                              color: isSelected ? AppColors.secondary : AppColors.textSecondary,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    label,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                      color: isSelected ? AppColors.secondary : AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    desc,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (isSelected)
+                              const Icon(Icons.check_circle_rounded, color: AppColors.secondary, size: 20),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            icon,
-                            color: isSelected ? AppColors.secondary : AppColors.textSecondary,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  label,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                                    color: isSelected ? AppColors.secondary : AppColors.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  desc,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (isSelected)
-                            const Icon(Icons.check_circle_rounded, color: AppColors.secondary, size: 20),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-              ],
+                    );
+                  }),
+                ],
+              ),
             ),
           ),
         );

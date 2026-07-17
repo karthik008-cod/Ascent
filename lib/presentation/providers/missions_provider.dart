@@ -129,3 +129,49 @@ final filteredSortedMissionsProvider = Provider<AsyncValue<List<Mission>>>((ref)
     return filtered;
   });
 });
+
+bool isMissionActiveForDay(Mission m, DateTime targetDate) {
+  final target = DateTime(targetDate.year, targetDate.month, targetDate.day);
+  final start = DateTime(m.date.year, m.date.month, m.date.day);
+
+  if (target.isBefore(start)) {
+    return false;
+  }
+
+  if (m.description == null) {
+    return target.isAtSameMomentAs(start);
+  }
+
+  final desc = m.description!;
+  if (desc.contains('Repeats: Daily')) {
+    return true;
+  } else if (desc.contains('Repeats: Weekly') || desc.contains('Repeats: Custom Days')) {
+    final daysMatch = RegExp(r'Days:\s*([0-9,\s]+)').firstMatch(desc);
+    if (daysMatch != null && daysMatch.group(1) != null) {
+      final days = daysMatch.group(1)!
+          .split(',')
+          .map((s) => int.tryParse(s.trim()))
+          .whereType<int>()
+          .toSet();
+      if (days.isNotEmpty) {
+        return days.contains(target.weekday);
+      }
+    }
+    if (desc.contains('Repeats: Weekly')) {
+      return target.weekday == start.weekday;
+    }
+    return true;
+  } else if (desc.contains('Repeats: Never')) {
+    return target.isAtSameMomentAs(start);
+  }
+
+  return target.isAtSameMomentAs(start);
+}
+
+final todayMissionsProvider = Provider<AsyncValue<List<Mission>>>((ref) {
+  final filteredAsync = ref.watch(filteredSortedMissionsProvider);
+  return filteredAsync.whenData((missions) {
+    final today = DateTime.now();
+    return missions.where((m) => isMissionActiveForDay(m, today)).toList();
+  });
+});

@@ -27,7 +27,7 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
   // Scheduling
   late DateTime _startDate;
   String _repeatMode = 'Never'; // 'Never', 'Daily', 'Weekly', 'Custom Days'
-  final Set<int> _selectedDays = {1, 2, 3, 4, 5}; // 1 = Mon, 7 = Sun
+  final Set<int> _selectedDays = {}; // 1 = Mon, 7 = Sun
   
   // Reminders & Tags
   TimeOfDay? _reminderTime;
@@ -40,6 +40,7 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
   void initState() {
     super.initState();
     _startDate = widget.existingMission?.date ?? DateTime.now();
+    _selectedDays.add(_startDate.weekday);
 
     if (widget.existingMission != null) {
       final mission = widget.existingMission!;
@@ -62,7 +63,38 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
               }
             }
           } else if (line.startsWith('Repeats: ')) {
-            _repeatMode = line.substring(9);
+            final repeatStr = line.substring(9).trim();
+            if (repeatStr.startsWith('Daily')) {
+              _repeatMode = 'Daily';
+            } else if (repeatStr.startsWith('Weekly')) {
+              _repeatMode = 'Weekly';
+              final match = RegExp(r'Days:\s*([0-9,\s]+)').firstMatch(repeatStr);
+              if (match != null && match.group(1) != null) {
+                _selectedDays.clear();
+                for (final s in match.group(1)!.split(',')) {
+                  final d = int.tryParse(s.trim());
+                  if (d != null) _selectedDays.add(d);
+                }
+              } else {
+                _selectedDays.clear();
+                _selectedDays.add(_startDate.weekday);
+              }
+            } else if (repeatStr.startsWith('Custom Days')) {
+              _repeatMode = 'Custom Days';
+              final match = RegExp(r'Days:\s*([0-9,\s]+)').firstMatch(repeatStr);
+              if (match != null && match.group(1) != null) {
+                _selectedDays.clear();
+                for (final s in match.group(1)!.split(',')) {
+                  final d = int.tryParse(s.trim());
+                  if (d != null) _selectedDays.add(d);
+                }
+              } else {
+                _selectedDays.clear();
+                _selectedDays.addAll([1, 2, 3, 4, 5]);
+              }
+            } else {
+              _repeatMode = 'Never';
+            }
           } else if (line.startsWith('Reminder: ')) {
             // keep noted
           } else if (line.startsWith('Reminder Repeat: ')) {
@@ -183,7 +215,16 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
       }
     }
     if (_repeatMode != 'Never') {
-      buffer.writeln('\nRepeats: $_repeatMode');
+      if (_repeatMode == 'Weekly' || _repeatMode == 'Custom Days') {
+        final sortedDays = _selectedDays.toList()..sort();
+        if (sortedDays.isNotEmpty) {
+          buffer.writeln('\nRepeats: $_repeatMode (Days: ${sortedDays.join(', ')})');
+        } else {
+          buffer.writeln('\nRepeats: $_repeatMode');
+        }
+      } else {
+        buffer.writeln('\nRepeats: $_repeatMode');
+      }
     }
     if (_reminderTime != null) {
       buffer.writeln('\nReminder: ${_reminderTime!.format(context)}');
@@ -509,6 +550,11 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
                                 if (val != null) {
                                   setState(() {
                                     _repeatMode = val;
+                                    if (_repeatMode == 'Weekly' && _selectedDays.isEmpty) {
+                                      _selectedDays.add(_startDate.weekday);
+                                    } else if (_repeatMode == 'Custom Days' && _selectedDays.isEmpty) {
+                                      _selectedDays.addAll([1, 2, 3, 4, 5]);
+                                    }
                                   });
                                 }
                               },

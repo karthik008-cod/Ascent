@@ -12,7 +12,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final missionsAsync = ref.watch(filteredSortedMissionsProvider);
+    final missionsAsync = ref.watch(todayMissionsProvider);
     final currentFilter = ref.watch(missionFilterProvider);
 
     return Scaffold(
