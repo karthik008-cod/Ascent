@@ -14,8 +14,8 @@ class ProgressScreen extends ConsumerWidget {
       body: SafeArea(
         child: statsAsync.when(
           data: (stats) {
-            final nextLevelXp = stats.currentLevel * 100;
-            final progress = (stats.totalXp % 100) / 100.0;
+            final nextLevelTotalXp = LevelSystem.getNextLevelTotalXp(stats.currentLevel);
+            final progress = LevelSystem.getLevelProgress(stats.totalXp);
             
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
@@ -101,7 +101,7 @@ class ProgressScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('${stats.totalXp} XP', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                      Text('$nextLevelXp XP', style: Theme.of(context).textTheme.bodyMedium),
+                      Text('$nextLevelTotalXp XP (Lvl ${stats.currentLevel + 1})', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.accent, fontWeight: FontWeight.w600)),
                     ],
                   ),
                   const SizedBox(height: 8),

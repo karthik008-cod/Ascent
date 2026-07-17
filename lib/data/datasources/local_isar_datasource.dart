@@ -91,4 +91,18 @@ class LocalIsarDataSource {
     final isar = await db;
     return await isar.projects.where().findAll();
   }
+
+  Future<void> saveProject(Project project) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      await isar.projects.put(project);
+    });
+  }
+
+  Future<void> deleteProject(int id) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      await isar.projects.delete(id);
+    });
+  }
 }

@@ -7,14 +7,30 @@ class AuthUser {
   final String id;
   final String email;
   final String name;
+  final String bio;
+  final String role;
+  final String socialHandle;
+  final String motto;
 
-  AuthUser({required this.id, required this.email, required this.name});
+  AuthUser({
+    required this.id,
+    required this.email,
+    required this.name,
+    this.bio = 'Leveling up daily in tech, habits & productivity.',
+    this.role = 'Ascent Pioneer',
+    this.socialHandle = '@yuvaan_dev',
+    this.motto = '1% better every single day.',
+  });
 
   factory AuthUser.fromMap(Map<String, dynamic> map) {
     return AuthUser(
-      id: map['_id'].toString(),
+      id: map['_id']?.toString() ?? map['id']?.toString() ?? '1',
       email: map['email'] ?? '',
-      name: map['name'] ?? 'User',
+      name: map['name'] ?? 'Yuvaan',
+      bio: map['bio'] ?? 'Leveling up daily in tech, habits & productivity.',
+      role: map['role'] ?? 'Ascent Pioneer',
+      socialHandle: map['socialHandle'] ?? '@yuvaan_dev',
+      motto: map['motto'] ?? '1% better every single day.',
     );
   }
 
@@ -23,7 +39,29 @@ class AuthUser {
       '_id': id,
       'email': email,
       'name': name,
+      'bio': bio,
+      'role': role,
+      'socialHandle': socialHandle,
+      'motto': motto,
     };
+  }
+
+  AuthUser copyWith({
+    String? name,
+    String? bio,
+    String? role,
+    String? socialHandle,
+    String? motto,
+  }) {
+    return AuthUser(
+      id: id,
+      email: email,
+      name: name ?? this.name,
+      bio: bio ?? this.bio,
+      role: role ?? this.role,
+      socialHandle: socialHandle ?? this.socialHandle,
+      motto: motto ?? this.motto,
+    );
   }
 }
 
@@ -43,11 +81,37 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
         final map = jsonDecode(userJson);
         state = AsyncValue.data(AuthUser.fromMap(map));
       } else {
-        state = const AsyncValue.data(null);
+        // If no user exists yet, set a rich default user profile so Yuvaan can view and edit it immediately
+        final defaultUser = AuthUser(
+          id: 'local_user',
+          email: 'yuvaan@ascent.app',
+          name: 'Yuvaan',
+        );
+        state = AsyncValue.data(defaultUser);
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
+  }
+
+  Future<void> updateProfile({
+    String? name,
+    String? bio,
+    String? role,
+    String? socialHandle,
+    String? motto,
+  }) async {
+    final current = state.value ?? AuthUser(id: 'local_user', email: 'yuvaan@ascent.app', name: 'Yuvaan');
+    final updatedUser = current.copyWith(
+      name: name,
+      bio: bio,
+      role: role,
+      socialHandle: socialHandle,
+      motto: motto,
+    );
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userKey, jsonEncode(updatedUser.toMap()));
+    state = AsyncValue.data(updatedUser);
   }
 
   Future<void> signIn(String email, String password) async {
@@ -93,7 +157,13 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
   Future<void> signOut() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey);
-    state = const AsyncValue.data(null);
+    // Return to default guest user
+    final defaultUser = AuthUser(
+      id: 'local_user',
+      email: 'yuvaan@ascent.app',
+      name: 'Yuvaan',
+    );
+    state = AsyncValue.data(defaultUser);
   }
 }
 
