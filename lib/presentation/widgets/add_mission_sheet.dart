@@ -154,7 +154,7 @@ class _AddMissionSheetState extends ConsumerState<AddMissionSheet> {
             children: [
               Icon(Icons.error_outline_rounded, color: AppColors.error),
               SizedBox(width: 10),
-              Text('Required Fields Missing'),
+              Expanded(child: Text('Required Fields Missing', overflow: TextOverflow.ellipsis)),
             ],
           ),
           content: const Text('Please fill in the Mission Title before committing to your mission board.'),

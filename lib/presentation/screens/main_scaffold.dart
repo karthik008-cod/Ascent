@@ -159,7 +159,7 @@ class _ReminderWrapperState extends ConsumerState<_ReminderWrapper> {
           children: [
             Icon(Icons.alarm_on_rounded, color: AppColors.primary, size: 28),
             SizedBox(width: 12),
-            Text('Mission Reminder'),
+            Expanded(child: Text('Mission Reminder', overflow: TextOverflow.ellipsis)),
           ],
         ),
         content: Column(
