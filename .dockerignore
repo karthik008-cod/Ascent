@@ -1,0 +1,13 @@
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.idea/
+.metadata
+build/
+android/
+ios/
+linux/
+macos/
+windows/
+test/
+*.log

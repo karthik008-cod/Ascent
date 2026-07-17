@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: ascent-web
+    env: docker
+    plan: free
+    autoDeploy: true
