@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -16,10 +17,26 @@ class LocalIsarDataSource {
   Future<Isar> _initDb() async {
     if (Isar.instanceNames.isEmpty) {
       final dir = await getApplicationDocumentsDirectory();
-      return await Isar.open(
-        [MissionSchema, ProjectSchema, TaskItemSchema, UserStatsSchema],
-        directory: dir.path,
-      );
+      try {
+        return await Isar.open(
+          [MissionSchema, ProjectSchema, TaskItemSchema, UserStatsSchema],
+          directory: dir.path,
+        );
+      } catch (e) {
+        // Handle collection ID or schema mismatch from previous app runs cleanly
+        try {
+          await Isar.getInstance()?.close(deleteFromDisk: true);
+        } catch (_) {}
+        final file = File('${dir.path}/default.isar');
+        if (await file.exists()) await file.delete();
+        final lockFile = File('${dir.path}/default.isar.lock');
+        if (await lockFile.exists()) await lockFile.delete();
+
+        return await Isar.open(
+          [MissionSchema, ProjectSchema, TaskItemSchema, UserStatsSchema],
+          directory: dir.path,
+        );
+      }
     }
     return Future.value(Isar.getInstance());
   }

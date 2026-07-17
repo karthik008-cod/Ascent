@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import '../../core/constants/app_colors.dart';
@@ -48,8 +49,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           throw Exception('Please enter your full name');
         }
         await ref.read(authNotifierProvider.notifier).signUp(email, password, name);
+        TextInput.finishAutofillContext();
       } else {
         await ref.read(authNotifierProvider.notifier).signIn(email, password);
+        TextInput.finishAutofillContext();
       }
     } catch (e) {
       setState(() {
@@ -112,53 +115,65 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ),
                 const SizedBox(height: 48),
 
-                if (_isSignUp) ...[
-                  TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Full Name',
-                      hintText: 'Enter your full name',
-                      prefixIcon: Icon(Icons.person_outline),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                AutofillGroup(
+                  child: Column(
+                    children: [
+                      if (_isSignUp) ...[
+                        TextField(
+                          controller: _nameController,
+                          autofillHints: const [AutofillHints.name],
+                          decoration: const InputDecoration(
+                            labelText: 'Full Name',
+                            hintText: 'Enter your full name',
+                            prefixIcon: Icon(Icons.person_outline),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
 
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email Address',
-                    hintText: 'name@example.com',
-                    prefixIcon: Icon(Icons.email_outlined),
+                      TextField(
+                        controller: _emailController,
+                        autofillHints: const [AutofillHints.email, AutofillHints.username],
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: const InputDecoration(
+                          labelText: 'Email Address',
+                          hintText: 'name@example.com',
+                          prefixIcon: Icon(Icons.email_outlined),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        autofillHints: _isSignUp 
+                            ? const [AutofillHints.newPassword] 
+                            : const [AutofillHints.password],
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Enter password',
+                          prefixIcon: Icon(Icons.lock_outline),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      if (_isSignUp) ...[
+                        TextField(
+                          controller: _confirmPasswordController,
+                          obscureText: true,
+                          autofillHints: const [AutofillHints.newPassword],
+                          decoration: const InputDecoration(
+                            labelText: 'Confirm Password',
+                            hintText: 'Re-enter your password',
+                            prefixIcon: Icon(Icons.lock_reset_outlined),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ] else
+                        const SizedBox(height: 8),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
-
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter password',
-                    prefixIcon: Icon(Icons.lock_outline),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                if (_isSignUp) ...[
-                  TextField(
-                    controller: _confirmPasswordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirm Password',
-                      hintText: 'Re-enter your password',
-                      prefixIcon: Icon(Icons.lock_reset_outlined),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ] else
-                  const SizedBox(height: 8),
 
                 if (_errorMessage != null)
                   Container(

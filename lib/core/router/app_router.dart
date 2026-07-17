@@ -13,16 +13,26 @@ import '../../presentation/providers/auth_provider.dart';
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
 
+class _GoRouterRefreshNotifier extends ChangeNotifier {
+  _GoRouterRefreshNotifier(Ref ref) {
+    ref.listen(authNotifierProvider, (_, next) {
+      notifyListeners();
+    });
+  }
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authNotifierProvider);
+  final refreshNotifier = _GoRouterRefreshNotifier(ref);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
+    refreshListenable: refreshNotifier,
     redirect: (context, state) {
+      final authState = ref.read(authNotifierProvider);
       if (authState.isLoading) return null;
       
-      final isAuthenticated = authState.value != null;
+      final isAuthenticated = authState.valueOrNull != null;
       final isGoingToAuth = state.matchedLocation == '/auth';
 
       if (!isAuthenticated && !isGoingToAuth) {
