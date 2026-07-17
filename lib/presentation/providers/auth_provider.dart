@@ -61,10 +61,11 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
         await prefs.setString(_userKey, jsonEncode(user.toMap()));
         state = AsyncValue.data(user);
       } else {
-        state = AsyncValue.error('Sign In Failed', StackTrace.current);
+        state = const AsyncValue.data(null);
+        throw Exception('Sign In Failed');
       }
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+    } catch (e) {
+      state = const AsyncValue.data(null);
       rethrow;
     }
   }
@@ -80,10 +81,11 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
         await prefs.setString(_userKey, jsonEncode(user.toMap()));
         state = AsyncValue.data(user);
       } else {
-        state = AsyncValue.error('Sign Up Failed', StackTrace.current);
+        state = const AsyncValue.data(null);
+        throw Exception('Sign Up Failed');
       }
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+    } catch (e) {
+      state = const AsyncValue.data(null);
       rethrow;
     }
   }
