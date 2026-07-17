@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/mission.dart';
+import '../../core/services/notification_service.dart';
 import 'data_providers.dart';
 import 'user_stats_provider.dart';
 
@@ -31,9 +32,10 @@ class MissionNotifier extends StateNotifier<AsyncValue<List<Mission>>> {
     mission.isCompleted = !mission.isCompleted;
     await repository.saveMission(mission);
     
-    // XP Calculation Use Case
+    // XP Calculation & Notification Cancellation
     if (mission.isCompleted) {
       await ref.read(userStatsNotifierProvider.notifier).addXp(mission.xpReward);
+      await NotificationService.cancelNotification(mission.id);
     } else {
       await ref.read(userStatsNotifierProvider.notifier).removeXp(mission.xpReward);
     }
@@ -55,6 +57,7 @@ class MissionNotifier extends StateNotifier<AsyncValue<List<Mission>>> {
 
   Future<void> deleteMission(int id) async {
     final repository = ref.read(missionRepositoryProvider);
+    await NotificationService.cancelNotification(id);
     await repository.deleteMission(id);
     await _loadMissions();
   }

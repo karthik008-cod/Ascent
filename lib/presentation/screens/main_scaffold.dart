@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/missions_provider.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/services/notification_service.dart';
 
 class MainScaffold extends ConsumerWidget {
   const MainScaffold({super.key, required this.navigationShell});
@@ -150,11 +149,6 @@ class _ReminderWrapperState extends ConsumerState<_ReminderWrapper> {
   void _triggerReminderAlert(String title, String timeStr) {
     HapticFeedback.heavyImpact();
     SystemSound.play(SystemSoundType.click);
-
-    NotificationService.showInstantNotification(
-      title: 'Ascent Reminder: $title',
-      body: 'It is $timeStr! Time to focus on your mission.',
-    );
 
     showDialog(
       context: context,
