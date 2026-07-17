@@ -15,7 +15,7 @@ extension GetUserStatsCollection on Isar {
 
 const UserStatsSchema = CollectionSchema(
   name: r'UserStats',
-  id: 3718987168289318233,
+  id: 371898716828931,
   properties: {
     r'currentLevel': PropertySchema(
       id: 0,

@@ -15,7 +15,7 @@ extension GetTaskItemCollection on Isar {
 
 const TaskItemSchema = CollectionSchema(
   name: r'TaskItem',
-  id: 2171180427076855156,
+  id: 217118042707685,
   properties: {
     r'createdAt': PropertySchema(
       id: 0,

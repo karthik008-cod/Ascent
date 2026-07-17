@@ -5,6 +5,7 @@ import '../providers/missions_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/models/mission.dart';
 import '../widgets/add_mission_sheet.dart';
+import '../widgets/filter_sort_bar.dart';
 
 class PlannerScreen extends ConsumerWidget {
   const PlannerScreen({super.key});
@@ -12,8 +13,6 @@ class PlannerScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final missionsAsync = ref.watch(filteredSortedMissionsProvider);
-    final currentFilter = ref.watch(missionFilterProvider);
-    final currentSort = ref.watch(missionSortProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -65,51 +64,7 @@ class PlannerScreen extends ConsumerWidget {
             ),
 
             // Filter & Sort Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildFilterChip(context, ref, 'All', currentFilter),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(context, ref, 'Main', currentFilter),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(context, ref, 'Side', currentFilter),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(context, ref, 'Routine', currentFilter),
-                    const SizedBox(width: 14),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceHighlight.withOpacity(0.35),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.surfaceHighlight),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: currentSort,
-                          icon: const Icon(Icons.sort_rounded, size: 16, color: AppColors.primary),
-                          dropdownColor: AppColors.surface,
-                          items: ['Default', 'XP High to Low', 'Title A-Z', 'Incomplete First'].map((s) {
-                            return DropdownMenuItem(
-                              value: s,
-                              child: Text(s, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            if (val != null) {
-                              ref.read(missionSortProvider.notifier).state = val;
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            const FilterSortBar(),
             const SizedBox(height: 10),
 
             missionsAsync.when(
@@ -162,31 +117,6 @@ class PlannerScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFilterChip(BuildContext context, WidgetRef ref, String label, String currentFilter) {
-    final isSelected = currentFilter == label;
-    return GestureDetector(
-      onTap: () {
-        ref.read(missionFilterProvider.notifier).state = label;
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.secondary : AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: isSelected ? AppColors.secondary : AppColors.surfaceHighlight),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textSecondary,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            fontSize: 12,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildPlannerTile(BuildContext context, WidgetRef ref, Mission mission) {
     return Container(

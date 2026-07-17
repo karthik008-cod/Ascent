@@ -5,6 +5,7 @@ import '../providers/missions_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/models/mission.dart';
 import '../widgets/add_mission_sheet.dart';
+import '../widgets/filter_sort_bar.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -13,7 +14,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final missionsAsync = ref.watch(filteredSortedMissionsProvider);
     final currentFilter = ref.watch(missionFilterProvider);
-    final currentSort = ref.watch(missionSortProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -85,51 +85,7 @@ class HomeScreen extends ConsumerWidget {
             ),
 
             // Compact Filter & Sort Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildFilterChip(context, ref, 'All', currentFilter),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(context, ref, 'Main', currentFilter),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(context, ref, 'Side', currentFilter),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(context, ref, 'Routine', currentFilter),
-                    const SizedBox(width: 14),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceHighlight.withOpacity(0.35),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.surfaceHighlight),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: currentSort,
-                          icon: const Icon(Icons.sort_rounded, size: 16, color: AppColors.primary),
-                          dropdownColor: AppColors.surface,
-                          items: ['Default', 'XP High to Low', 'Title A-Z', 'Incomplete First'].map((s) {
-                            return DropdownMenuItem(
-                              value: s,
-                              child: Text(s, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            if (val != null) {
-                              ref.read(missionSortProvider.notifier).state = val;
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            const FilterSortBar(),
             const SizedBox(height: 6),
 
             // Main Priority Mission Board List
@@ -156,6 +112,38 @@ class HomeScreen extends ConsumerWidget {
                   return ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
                     children: [
+                      if (mainMissions.isEmpty && sideMissions.isEmpty && routines.isEmpty && currentFilter != 'All') ...[
+                        const SizedBox(height: 40),
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: AppColors.surfaceHighlight),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.filter_list_off_rounded, size: 48, color: AppColors.textSecondary),
+                                const SizedBox(height: 14),
+                                Text(
+                                  'No missions found for "$currentFilter"',
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  'Try changing or resetting your filter from the top bar.',
+                                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+
                       // 🔥 MAIN GOAL (60-70% Effort)
                       if (mainMissions.isNotEmpty || currentFilter == 'Main' || currentFilter == 'All') ...[
                         _buildSectionBanner(
@@ -248,31 +236,6 @@ class HomeScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildFilterChip(BuildContext context, WidgetRef ref, String label, String currentFilter) {
-    final isSelected = currentFilter == label;
-    return GestureDetector(
-      onTap: () {
-        ref.read(missionFilterProvider.notifier).state = label;
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: isSelected ? AppColors.primary : AppColors.surfaceHighlight),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textSecondary,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            fontSize: 12,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildSectionBanner(BuildContext context, {required String icon, required String title, required String subtitle, required Color color}) {
     return Container(

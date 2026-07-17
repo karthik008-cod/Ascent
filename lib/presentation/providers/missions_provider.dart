@@ -70,6 +70,24 @@ final missionNotifierProvider = StateNotifierProvider<MissionNotifier, AsyncValu
 final missionFilterProvider = StateProvider<String>((ref) => 'All');
 final missionSortProvider = StateProvider<String>((ref) => 'Default');
 
+final availableHashtagsProvider = Provider<List<String>>((ref) {
+  final missionsAsync = ref.watch(missionNotifierProvider);
+  final Set<String> tags = {'#Career', '#Fitness', '#Mindset', '#Project', '#Personal'};
+  missionsAsync.whenData((missions) {
+    for (final m in missions) {
+      if (m.description != null) {
+        final matches = RegExp(r'#\w+').allMatches(m.description!);
+        for (final match in matches) {
+          if (match.group(0) != null) {
+            tags.add(match.group(0)!);
+          }
+        }
+      }
+    }
+  });
+  return tags.toList()..sort();
+});
+
 final filteredSortedMissionsProvider = Provider<AsyncValue<List<Mission>>>((ref) {
   final missionsAsync = ref.watch(missionNotifierProvider);
   final filter = ref.watch(missionFilterProvider);
@@ -93,6 +111,19 @@ final filteredSortedMissionsProvider = Provider<AsyncValue<List<Mission>>>((ref)
       filtered.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     } else if (sort == 'Incomplete First') {
       filtered.sort((a, b) => (a.isCompleted ? 1 : 0).compareTo(b.isCompleted ? 1 : 0));
+    } else if (sort == 'By Hashtag') {
+      filtered.sort((a, b) {
+        String extractTag(Mission m) {
+          if (m.description == null) return 'zzzzz';
+          final match = RegExp(r'#\w+').firstMatch(m.description!);
+          return match != null ? match.group(0)!.toLowerCase() : 'zzzzz';
+        }
+        final tagA = extractTag(a);
+        final tagB = extractTag(b);
+        final cmp = tagA.compareTo(tagB);
+        if (cmp != 0) return cmp;
+        return (a.isCompleted ? 1 : 0).compareTo(b.isCompleted ? 1 : 0);
+      });
     }
 
     return filtered;

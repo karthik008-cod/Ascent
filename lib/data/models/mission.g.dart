@@ -15,7 +15,7 @@ extension GetMissionCollection on Isar {
 
 const MissionSchema = CollectionSchema(
   name: r'Mission',
-  id: -3542838313713095933,
+  id: -354283831371309,
   properties: {
     r'date': PropertySchema(
       id: 0,
