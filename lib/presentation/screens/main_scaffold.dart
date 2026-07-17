@@ -35,6 +35,74 @@ class MainScaffold extends ConsumerWidget {
   }
 }
 
+class AnimatedTabContainer extends StatefulWidget {
+  const AnimatedTabContainer({
+    super.key,
+    required this.navigationShell,
+    required this.children,
+  });
+
+  final StatefulNavigationShell navigationShell;
+  final List<Widget> children;
+
+  @override
+  State<AnimatedTabContainer> createState() => _AnimatedTabContainerState();
+}
+
+class _AnimatedTabContainerState extends State<AnimatedTabContainer> {
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.navigationShell.currentIndex);
+  }
+
+  @override
+  void didUpdateWidget(covariant AnimatedTabContainer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final newIndex = widget.navigationShell.currentIndex;
+    final oldIndex = oldWidget.navigationShell.currentIndex;
+    
+    if (newIndex != oldIndex) {
+      if (_pageController.hasClients && _pageController.page?.round() != newIndex) {
+        if ((newIndex - oldIndex).abs() > 1) {
+          final jumpIndex = newIndex > oldIndex ? newIndex - 1 : newIndex + 1;
+          _pageController.jumpToPage(jumpIndex);
+        }
+        _pageController.animateToPage(
+          newIndex,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PageView(
+      controller: _pageController,
+      physics: const PageScrollPhysics(parent: BouncingScrollPhysics()),
+      onPageChanged: (index) {
+        if (index != widget.navigationShell.currentIndex) {
+          widget.navigationShell.goBranch(
+            index,
+            initialLocation: index == widget.navigationShell.currentIndex,
+          );
+        }
+      },
+      children: widget.children,
+    );
+  }
+}
+
 class _ReminderWrapper extends ConsumerStatefulWidget {
   const _ReminderWrapper({required this.child});
   final Widget child;
