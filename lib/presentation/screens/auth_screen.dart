@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import '../../core/constants/app_colors.dart';
@@ -50,9 +51,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         }
         await ref.read(authNotifierProvider.notifier).signUp(email, password, name);
         TextInput.finishAutofillContext();
+        if (mounted) context.go('/');
       } else {
         await ref.read(authNotifierProvider.notifier).signIn(email, password);
         TextInput.finishAutofillContext();
+        if (mounted) context.go('/');
       }
     } catch (e) {
       setState(() {

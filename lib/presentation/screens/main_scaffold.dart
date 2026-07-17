@@ -8,18 +8,21 @@ import '../../core/constants/app_colors.dart';
 import '../../core/services/notification_service.dart';
 
 class MainScaffold extends ConsumerWidget {
-  const MainScaffold({super.key, required this.child});
+  const MainScaffold({super.key, required this.navigationShell});
   
-  final Widget child;
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return _ReminderWrapper(
       child: Scaffold(
-        body: child,
+        body: navigationShell,
         bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _calculateSelectedIndex(context),
-          onTap: (int idx) => _onItemTapped(idx, context),
+          currentIndex: navigationShell.currentIndex,
+          onTap: (int idx) => navigationShell.goBranch(
+            idx,
+            initialLocation: idx == navigationShell.currentIndex,
+          ),
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Today'),
             BottomNavigationBarItem(icon: Icon(Icons.calendar_view_week_rounded), label: 'Planner'),
@@ -29,31 +32,6 @@ class MainScaffold extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  static int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/planner')) return 1;
-    if (location.startsWith('/progress')) return 2;
-    if (location.startsWith('/profile')) return 3;
-    return 0;
-  }
-
-  void _onItemTapped(int index, BuildContext context) {
-    switch (index) {
-      case 0:
-        GoRouter.of(context).go('/');
-        break;
-      case 1:
-        GoRouter.of(context).go('/planner');
-        break;
-      case 2:
-        GoRouter.of(context).go('/progress');
-        break;
-      case 3:
-        GoRouter.of(context).go('/profile');
-        break;
-    }
   }
 }
 
