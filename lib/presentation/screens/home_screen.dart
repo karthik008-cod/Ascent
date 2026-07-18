@@ -31,7 +31,7 @@ class HomeScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _getDynamicGreeting(),
+                          _getDynamicGreeting(ref.watch(authNotifierProvider).value?.name ?? 'Guest'),
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
@@ -225,14 +225,14 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  String _getDynamicGreeting() {
+  String _getDynamicGreeting(String name) {
     final hour = DateTime.now().hour;
     if (hour < 12) {
-      return 'Good Morning, Yuvaan';
+      return 'Good Morning, $name';
     } else if (hour < 17) {
-      return 'Good Afternoon, Yuvaan';
+      return 'Good Afternoon, $name';
     } else {
-      return 'Good Evening, Yuvaan';
+      return 'Good Evening, $name';
     }
   }
 

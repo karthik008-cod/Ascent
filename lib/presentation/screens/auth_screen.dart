@@ -19,6 +19,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   bool _userExists = false;
   bool _isLoading = false;
   String? _errorMessage;
+  bool _obscurePassword = true;
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -138,10 +139,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       _setError('Please enter your full name.');
       return;
     }
-    if (password.length < 6) {
-      _setError('Password must be at least 6 characters.');
+    
+    final passwordRegex = RegExp(r'^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$&*~]).{8,}$');
+    if (!passwordRegex.hasMatch(password)) {
+      _setError('Password must be at least 8 chars, with 1 uppercase, 1 number, and 1 special character (!@#\$&*~).');
       return;
     }
+
     if (password != confirm) {
       _setError('Passwords do not match.');
       return;
@@ -311,8 +315,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         const SizedBox(height: 48),
         TextField(
           controller: _passwordController,
-          obscureText: true,
-          decoration: const InputDecoration(labelText: 'Password', prefixIcon: Icon(Icons.lock_outline)),
+          obscureText: _obscurePassword,
+          decoration: InputDecoration(
+            labelText: 'Password',
+            prefixIcon: const Icon(Icons.lock_outline),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                color: _obscurePassword ? Colors.grey : AppColors.primary,
+              ),
+              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+              splashRadius: 20,
+            ),
+          ),
         ),
         const SizedBox(height: 24),
         _buildError(),
@@ -367,13 +382,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         const SizedBox(height: 16),
         TextField(
           controller: _passwordController,
-          obscureText: true,
-          decoration: const InputDecoration(labelText: 'Create Password', prefixIcon: Icon(Icons.lock_outline)),
+          obscureText: _obscurePassword,
+          decoration: InputDecoration(
+            labelText: 'Create Password',
+            prefixIcon: const Icon(Icons.lock_outline),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                color: _obscurePassword ? Colors.grey : AppColors.primary,
+              ),
+              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+              splashRadius: 20,
+            ),
+          ),
         ),
         const SizedBox(height: 16),
         TextField(
           controller: _confirmPasswordController,
-          obscureText: true,
+          obscureText: _obscurePassword,
           decoration: const InputDecoration(labelText: 'Confirm Password', prefixIcon: Icon(Icons.lock_reset_outlined)),
         ),
         const SizedBox(height: 24),
