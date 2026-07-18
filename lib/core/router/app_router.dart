@@ -14,10 +14,25 @@ import '../../presentation/providers/auth_provider.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
-/// Tracks whether user has seen onboarding. Loaded once at startup.
-final hasSeenOnboardingProvider = FutureProvider<bool>((ref) async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('hasSeenOnboarding') ?? false;
+class OnboardingNotifier extends StateNotifier<AsyncValue<bool>> {
+  OnboardingNotifier() : super(const AsyncValue.loading()) {
+    _init();
+  }
+
+  Future<void> _init() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = AsyncValue.data(prefs.getBool('hasSeenOnboarding') ?? false);
+  }
+
+  Future<void> completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasSeenOnboarding', true);
+    state = const AsyncValue.data(true);
+  }
+}
+
+final onboardingNotifierProvider = StateNotifierProvider<OnboardingNotifier, AsyncValue<bool>>((ref) {
+  return OnboardingNotifier();
 });
 
 class _GoRouterRefreshNotifier extends ChangeNotifier {
@@ -25,7 +40,7 @@ class _GoRouterRefreshNotifier extends ChangeNotifier {
     ref.listen(authNotifierProvider, (_, next) {
       notifyListeners();
     });
-    ref.listen(hasSeenOnboardingProvider, (_, next) {
+    ref.listen(onboardingNotifierProvider, (_, next) {
       notifyListeners();
     });
   }
@@ -40,26 +55,32 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshNotifier,
     redirect: (context, state) {
       final authState = ref.read(authNotifierProvider);
-      final onboardingState = ref.read(hasSeenOnboardingProvider);
+      final onboardingState = ref.read(onboardingNotifierProvider);
       
-      if (authState.isLoading) return null;
+      if (authState.isLoading || onboardingState.isLoading) return null;
 
-      final hasSeenOnboarding = onboardingState.valueOrNull ?? false;
+      final hasSeenOnboarding = onboardingState.value ?? false;
       final isAuthenticated = authState.valueOrNull != null;
-      final currentPath = state.matchedLocation;
+      final currentPath = state.uri.path;
 
-      // First: check onboarding
-      if (!hasSeenOnboarding && currentPath != '/onboarding') {
-        return '/onboarding';
+      if (!hasSeenOnboarding) {
+        if (currentPath != '/onboarding') {
+          return '/onboarding';
+        }
+        return null;
       }
 
-      // Then: check auth
-      if (hasSeenOnboarding && !isAuthenticated && currentPath != '/auth' && currentPath != '/onboarding') {
-        return '/auth';
+      if (!isAuthenticated) {
+        if (currentPath != '/auth') {
+          return '/auth';
+        }
+        return null;
       }
-      if (isAuthenticated && (currentPath == '/auth' || currentPath == '/onboarding')) {
+
+      if (currentPath == '/auth' || currentPath == '/onboarding') {
         return '/';
       }
+
       return null;
     },
     routes: [

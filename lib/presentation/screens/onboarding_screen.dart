@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/router/app_router.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   /// When true, shows "Close" on the last page instead of "Get Started"
   /// and doesn't navigate to auth.
   final bool isHelpMode;
@@ -11,10 +13,10 @@ class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key, this.isHelpMode = false});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -24,40 +26,44 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       gradientColors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
       title: 'Today',
       subtitle: 'Your Daily Mission Control',
-      description:
-          'See all your active missions for today at a glance. '
-          'Complete tasks, earn XP, level up, and build powerful daily streaks. '
+      points: [
+          'See all your active missions for today at a glance.',
+          'Complete tasks, earn XP, level up, and build powerful daily streaks.',
           'Every mission accomplished brings you closer to your goals.',
+      ],
     ),
     _OnboardingPageData(
       icon: Icons.calendar_view_week_rounded,
       gradientColors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
       title: 'Planner',
       subtitle: 'Strategize Your Week',
-      description:
-          'Plan missions across the entire week with smart repetition. '
-          'Set priorities, schedule reminders, and let Ascent intelligently '
-          'rotate your focus so nothing falls through the cracks.',
+      points: [
+          'Plan missions across the entire week with smart repetition.',
+          'Set priorities, schedule reminders, and intelligently rotate your focus.',
+          'Nothing falls through the cracks.',
+      ],
     ),
     _OnboardingPageData(
       icon: Icons.show_chart_rounded,
       gradientColors: [Color(0xFF10B981), Color(0xFF059669)],
       title: 'Progress',
       subtitle: 'Track Your Growth',
-      description:
-          'Watch your XP climb with an exponential leveling system inspired by games. '
-          'Track streaks, unlock badges, manage active projects, '
-          'and visualize your weekly activity at a glance.',
+      points: [
+          'Watch your XP climb with an exponential leveling system.',
+          'Track streaks, unlock badges, and manage active projects.',
+          'Visualize your weekly activity at a glance.',
+      ],
     ),
     _OnboardingPageData(
       icon: Icons.person_rounded,
       gradientColors: [Color(0xFFF59E0B), Color(0xFFD97706)],
       title: 'Profile',
       subtitle: 'Your Identity & Bio',
-      description:
-          'Customize your name, role, motto, and bio. '
-          'Your profile is your personal brand within Ascent — '
-          'make it reflect who you are and who you want to become.',
+      points: [
+          'Customize your name, role, motto, and bio.',
+          'Your profile is your personal brand within Ascent.',
+          'Make it reflect who you are and who you want to become.',
+      ],
     ),
   ];
 
@@ -69,8 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (widget.isHelpMode) {
       Navigator.of(context).pop();
     } else {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('hasSeenOnboarding', true);
+      await ref.read(onboardingNotifierProvider.notifier).completeOnboarding();
       if (mounted) context.go('/auth');
     }
   }
@@ -262,15 +267,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          // Description
-          Text(
-            data.description,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 15,
-              height: 1.6,
-              color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
-            ),
+          // Points
+          Column(
+            children: data.points.map((point) => Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('•', style: TextStyle(fontSize: 18, color: AppColors.primary, fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      point,
+                      style: TextStyle(
+                        fontSize: 15,
+                        height: 1.4,
+                        color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )).toList(),
           ),
         ],
       ),
@@ -283,13 +301,13 @@ class _OnboardingPageData {
   final List<Color> gradientColors;
   final String title;
   final String subtitle;
-  final String description;
+  final List<String> points;
 
   const _OnboardingPageData({
     required this.icon,
     required this.gradientColors,
     required this.title,
     required this.subtitle,
-    required this.description,
+    required this.points,
   });
 }

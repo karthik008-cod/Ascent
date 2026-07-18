@@ -14,6 +14,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final missionsAsync = ref.watch(todayMissionsProvider);
     final currentFilter = ref.watch(missionFilterProvider);
 
@@ -36,7 +37,7 @@ class HomeScreen extends ConsumerWidget {
                           _getDynamicGreeting(ref.watch(authNotifierProvider).value?.name ?? 'Guest'),
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary,
                             fontSize: 22,
                           ),
                         ),
@@ -45,7 +46,7 @@ class HomeScreen extends ConsumerWidget {
                           'What deserves most of your attention today?',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
                           ),
                         ),
                       ],
@@ -56,9 +57,9 @@ class HomeScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceHighlight.withOpacity(0.4),
+                          color: (isDark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight).withOpacity(0.4),
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: AppColors.surfaceHighlight),
+                          border: Border.all(color: isDark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight),
                         ),
                         child: Text(
                           DateFormat('E, MMM dd').format(DateTime.now()),
@@ -106,7 +107,7 @@ class HomeScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.track_changes_rounded, size: 64, color: AppColors.surfaceHighlight),
+                          Icon(Icons.track_changes_rounded, size: 64, color: isDark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight),
                           const SizedBox(height: 16),
                           Text('No missions assigned for today\'s priority.', style: Theme.of(context).textTheme.bodyLarge),
                         ],
@@ -123,24 +124,24 @@ class HomeScreen extends ConsumerWidget {
                           child: Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: AppColors.surface,
+                              color: isDark ? AppColors.surface : AppColors.lightSurface,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: AppColors.surfaceHighlight),
+                              border: Border.all(color: isDark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight),
                             ),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.filter_list_off_rounded, size: 48, color: AppColors.textSecondary),
+                                Icon(Icons.filter_list_off_rounded, size: 48, color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary),
                                 const SizedBox(height: 14),
                                 Text(
                                   'No missions found for "$currentFilter"',
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary),
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 6),
-                                const Text(
+                                Text(
                                   'Try changing or resetting your filter from the top bar.',
-                                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                  style: TextStyle(fontSize: 13, color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary),
                                   textAlign: TextAlign.center,
                                 ),
                               ],

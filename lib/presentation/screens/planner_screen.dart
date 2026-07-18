@@ -13,6 +13,7 @@ class PlannerScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final missionsAsync = ref.watch(filteredSortedMissionsProvider);
 
     return Scaffold(
@@ -32,7 +33,7 @@ class PlannerScreen extends ConsumerWidget {
                         'Weekly Planner & Inbox',
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary,
                           fontSize: 22,
                         ),
                       ),
@@ -41,7 +42,7 @@ class PlannerScreen extends ConsumerWidget {
                         'Intelligently rotate priorities by day.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
                         ),
                       ),
                     ],
@@ -79,7 +80,7 @@ class PlannerScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.inbox_rounded, size: 64, color: AppColors.surfaceHighlight),
+                          Icon(Icons.inbox_rounded, size: 64, color: isDark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight),
                           const SizedBox(height: 16),
                           Text('No tasks right now.', style: Theme.of(context).textTheme.bodyLarge),
                         ],
@@ -123,10 +124,11 @@ class PlannerScreen extends ConsumerWidget {
 
 
   Widget _buildPlannerTile(BuildContext context, WidgetRef ref, Mission mission) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
-        color: AppColors.surface,
+        color: isDark ? AppColors.surface : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
@@ -148,7 +150,7 @@ class PlannerScreen extends ConsumerWidget {
                   },
                   child: Icon(
                     mission.isCompleted ? Icons.check_circle_rounded : Icons.circle_outlined,
-                    color: mission.isCompleted ? AppColors.success : AppColors.textSecondary,
+                    color: mission.isCompleted ? AppColors.success : (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary),
                     size: 26,
                   ),
                 ),
@@ -164,7 +166,7 @@ class PlannerScreen extends ConsumerWidget {
                               mission.title,
                               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 decoration: mission.isCompleted ? TextDecoration.lineThrough : null,
-                                color: mission.isCompleted ? AppColors.textSecondary : AppColors.textPrimary,
+                                color: mission.isCompleted ? (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary) : (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -185,11 +187,11 @@ class PlannerScreen extends ConsumerWidget {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.textSecondary.withOpacity(0.7)),
+                          Icon(Icons.calendar_today_rounded, size: 12, color: (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary).withOpacity(0.7)),
                           const SizedBox(width: 4),
                           Text(
                             DateFormat('MMM dd, yyyy').format(mission.date),
-                            style: TextStyle(fontSize: 12, color: AppColors.textSecondary.withOpacity(0.8)),
+                            style: TextStyle(fontSize: 12, color: (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary).withOpacity(0.8)),
                           ),
                           if (mission.description != null && mission.description!.contains('Reminder:')) ...[
                             const SizedBox(width: 12),
@@ -206,7 +208,7 @@ class PlannerScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(Icons.edit_outlined, size: 16, color: AppColors.textSecondary),
+                Icon(Icons.edit_outlined, size: 16, color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary),
               ],
             ),
           ),
