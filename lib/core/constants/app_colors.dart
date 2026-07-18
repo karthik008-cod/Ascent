@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  // ── Dark Mode ──
   static const Color background = Color(0xFF09090B); // Deep OLED Black
   static const Color surface = Color(0xFF18181B); // Slightly lighter for cards
   static const Color surfaceHighlight = Color(0xFF27272A);
@@ -22,4 +23,12 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
+
+  // ── Light Mode ──
+  static const Color lightBackground = Color(0xFFF8F9FC);
+  static const Color lightSurface = Color(0xFFFFFFFF);
+  static const Color lightSurfaceHighlight = Color(0xFFE4E4E7);
+
+  static const Color lightTextPrimary = Color(0xFF18181B);
+  static const Color lightTextSecondary = Color(0xFF71717A);
 }

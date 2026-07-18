@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../data/models/mission.dart';
 import '../widgets/add_mission_sheet.dart';
 import '../widgets/filter_sort_bar.dart';
+import '../widgets/settings_drawer.dart';
 
 class PlannerScreen extends ConsumerWidget {
   const PlannerScreen({super.key});
@@ -45,17 +46,20 @@ class PlannerScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.primary.withOpacity(0.6), width: 1.5),
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        fit: BoxFit.cover,
+                  GestureDetector(
+                    onTap: () => SettingsDrawer.show(context, ref),
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.primary.withOpacity(0.6), width: 1.5),
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),

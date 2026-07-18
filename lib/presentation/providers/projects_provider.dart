@@ -14,22 +14,6 @@ class ProjectsNotifier extends StateNotifier<AsyncValue<List<Project>>> {
     try {
       final repository = ref.read(projectRepositoryProvider);
       var projects = await repository.getAllProjects();
-      if (projects.isEmpty) {
-        // Create initial default starter projects for user flexibility
-        final p1 = Project()
-          ..title = 'Ascent Mobile & Web App'
-          ..description = 'Building full-stack productivity ecosystem with Level & XP gamification'
-          ..progress = 0.75
-          ..notes = 'Integrated with Isar local storage and Render web deployment.';
-        final p2 = Project()
-          ..title = 'Skill Mastery & Career Goals'
-          ..description = 'Tracking long-term learning milestones and professional projects'
-          ..progress = 0.40
-          ..notes = 'Focus on scalable architectures and modern UI design.';
-        await repository.saveProject(p1);
-        await repository.saveProject(p2);
-        projects = await repository.getAllProjects();
-      }
       state = AsyncValue.data(projects);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
