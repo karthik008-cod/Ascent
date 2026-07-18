@@ -25,7 +25,7 @@ app.post('/api/send-otp', async (req, res) => {
     return res.status(500).json({ error: 'Server configuration error' });
   }
 
-  const senderEmail = 'noreply@ascent.app';
+  const senderEmail = 'aakasltf06@gmail.com';
   const senderName = 'Ascent';
   
   const brevoUrl = 'https://api.brevo.com/v3/smtp/email';
