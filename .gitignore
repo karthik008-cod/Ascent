@@ -9,6 +9,8 @@
 .buildlog/
 .history
 .svn/
+.vscode/
+run_app.bat
 .swiftpm/
 migrate_working_dir/
 
