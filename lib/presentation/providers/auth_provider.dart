@@ -81,13 +81,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
         final map = jsonDecode(userJson);
         state = AsyncValue.data(AuthUser.fromMap(map));
       } else {
-        // If no user exists yet, set a rich default user profile so Yuvaan can view and edit it immediately
-        final defaultUser = AuthUser(
-          id: 'local_user',
-          email: 'yuvaan@ascent.app',
-          name: 'Yuvaan',
-        );
-        state = AsyncValue.data(defaultUser);
+        // No user is logged in, require explicit auth
+        state = const AsyncValue.data(null);
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -157,13 +152,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
   Future<void> signOut() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey);
-    // Return to default guest user
-    final defaultUser = AuthUser(
-      id: 'local_user',
-      email: 'yuvaan@ascent.app',
-      name: 'Yuvaan',
-    );
-    state = AsyncValue.data(defaultUser);
+    // Explicitly sign out, forcing router to redirect to auth screen
+    state = const AsyncValue.data(null);
   }
 }
 

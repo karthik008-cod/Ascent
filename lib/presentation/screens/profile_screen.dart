@@ -282,7 +282,7 @@ class ProfileScreen extends ConsumerWidget {
                   const Divider(color: AppColors.surfaceHighlight, height: 1),
                   ListTile(
                     leading: const Icon(Icons.logout_rounded, color: AppColors.error),
-                    title: const Text('Reset Guest Session / Sign Out', style: TextStyle(color: AppColors.error)),
+                    title: const Text('Sign Out', style: TextStyle(color: AppColors.error)),
                     trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.error),
                     onTap: () {
                       ref.read(authNotifierProvider.notifier).signOut();
