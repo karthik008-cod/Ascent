@@ -9,8 +9,8 @@ RUN flutter pub get
 
 # Copy full source code and build for web
 COPY . .
-ARG BREVO_API_KEY
-RUN flutter build web --release --dart-define=BREVO_API_KEY=${BREVO_API_KEY}
+ARG API_URL
+RUN flutter build web --release --dart-define=API_URL=${API_URL}
 
 # Stage 2: Serve with Nginx Alpine
 FROM nginx:alpine
