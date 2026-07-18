@@ -1,6 +1,15 @@
 services:
+  # The Flutter Web Frontend
   - type: web
     name: ascent-web
     env: docker
     plan: free
     autoDeploy: true
+    
+  # The Node.js API Backend
+  - type: web
+    name: ascent-api
+    env: docker
+    plan: free
+    autoDeploy: true
+    rootDir: backend
