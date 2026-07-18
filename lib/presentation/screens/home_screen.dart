@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/missions_provider.dart';
+import '../providers/auth_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/models/mission.dart';
 import '../widgets/add_mission_sheet.dart';
