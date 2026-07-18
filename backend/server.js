@@ -75,6 +75,6 @@ app.get('/health', (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Ascent Backend API listening on port ${PORT}`);
 });
