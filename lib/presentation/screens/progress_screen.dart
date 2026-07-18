@@ -6,6 +6,7 @@ import '../providers/projects_provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/models/project.dart';
 import '../widgets/settings_drawer.dart';
+import '../widgets/level_up_celebration.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   const ProgressScreen({super.key});
@@ -211,22 +212,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> with SingleTick
                   // Badges
                   Text('BADGES', style: Theme.of(context).textTheme.labelSmall?.copyWith(letterSpacing: 1.5)),
                   const SizedBox(height: 12),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildBadge(context, 'Pioneer', Icons.explore_rounded, true, 'Joined Ascent'),
-                        const SizedBox(width: 10),
-                        _buildBadge(context, 'Consistent', Icons.calendar_month_rounded, stats.currentStreak >= 7, '7-day streak'),
-                        const SizedBox(width: 10),
-                        _buildBadge(context, 'Achiever', Icons.star_rounded, stats.currentLevel >= 5, 'Reach Lvl 5'),
-                        const SizedBox(width: 10),
-                        _buildBadge(context, 'Warrior', Icons.shield_rounded, stats.currentLevel >= 10, 'Reach Lvl 10'),
-                        const SizedBox(width: 10),
-                        _buildBadge(context, 'Legend', Icons.auto_awesome_rounded, stats.longestStreak >= 30, '30-day streak'),
-                      ],
-                    ),
-                  ),
+                  _buildBadgesSection(context, stats.currentLevel, stats.currentStreak, stats.longestStreak),
                   const SizedBox(height: 28),
 
                   // Active Projects (moved from Profile)
@@ -394,19 +380,78 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> with SingleTick
     );
   }
 
-  Widget _buildBadge(BuildContext context, String name, IconData icon, bool isUnlocked, String description) {
+  // ── Badge System (data from level_up_celebration.dart) ──
+
+  Widget _buildBadgesSection(BuildContext context, int currentLevel, int currentStreak, int longestStreak) {
+    // Show unlocked badges first, then locked
+    final unlocked = allBadges.where((b) => currentLevel >= b.level).toList();
+    final locked = allBadges.where((b) => currentLevel < b.level).toList();
+
+    final unlockedCount = unlocked.length;
+    final totalCount = allBadges.length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Progress summary
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.primary.withOpacity(0.12), AppColors.accent.withOpacity(0.08)],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.primary.withOpacity(0.25)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.emoji_events_rounded, color: AppColors.accent, size: 22),
+              const SizedBox(width: 10),
+              Text(
+                '$unlockedCount / $totalCount Badges Unlocked',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              if (locked.isNotEmpty)
+                Text(
+                  'Next: Lvl ${locked.first.level}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        // Scrollable badge row
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              for (int i = 0; i < allBadges.length; i++) ...[
+                _buildBadge(context, allBadges[i], currentLevel >= allBadges[i].level),
+                if (i < allBadges.length - 1) const SizedBox(width: 10),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBadge(BuildContext context, BadgeData badge, bool isUnlocked) {
     return GestureDetector(
       onTap: () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isUnlocked ? '🏅 $name — Unlocked!' : '🔒 $name — $description'),
+            content: Text(isUnlocked
+                ? '${badge.emoji} ${badge.name} — ${badge.desc}'
+                : '🔒 ${badge.name} — Reach Lvl ${badge.level} to unlock'),
             duration: const Duration(seconds: 2),
           ),
         );
       },
       child: Container(
-        width: 80,
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        width: 82,
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: isUnlocked
               ? AppColors.primary.withOpacity(0.1)
@@ -421,11 +466,18 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> with SingleTick
         ),
         child: Column(
           children: [
-            Icon(icon, color: isUnlocked ? AppColors.primary : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.3), size: 28),
-            const SizedBox(height: 6),
-            Text(name, style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: isUnlocked ? null : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
-              fontSize: 10,
+            Text(badge.emoji, style: TextStyle(fontSize: isUnlocked ? 26 : 20)),
+            const SizedBox(height: 4),
+            Text(badge.name, textAlign: TextAlign.center, style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: isUnlocked ? null : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.45),
+              fontSize: 9,
+              fontWeight: isUnlocked ? FontWeight.bold : FontWeight.normal,
+            )),
+            const SizedBox(height: 2),
+            Text('Lvl ${badge.level}', style: TextStyle(
+              fontSize: 8,
+              color: isUnlocked ? AppColors.primary : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.3),
+              fontWeight: FontWeight.w600,
             )),
           ],
         ),

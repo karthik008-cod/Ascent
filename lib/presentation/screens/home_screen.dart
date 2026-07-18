@@ -8,6 +8,7 @@ import '../../data/models/mission.dart';
 import '../widgets/add_mission_sheet.dart';
 import '../widgets/filter_sort_bar.dart';
 import '../widgets/settings_drawer.dart';
+import '../widgets/level_up_celebration.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -328,8 +329,11 @@ class HomeScreen extends ConsumerWidget {
                     const Icon(Icons.edit_outlined, color: Colors.white70, size: 20),
                     const SizedBox(width: 12),
                     GestureDetector(
-                      onTap: () {
-                        ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                      onTap: () async {
+                        final newLevel = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                        if (newLevel != null && context.mounted) {
+                          showLevelUpCelebration(context, newLevel);
+                        }
                       },
                       child: mission.isCompleted
                           ? const Icon(Icons.check_circle_rounded, color: Colors.white, size: 30)
@@ -380,8 +384,11 @@ class HomeScreen extends ConsumerWidget {
         child: Row(
           children: [
             GestureDetector(
-              onTap: () {
-                ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+              onTap: () async {
+                final newLevel = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                if (newLevel != null && context.mounted) {
+                  showLevelUpCelebration(context, newLevel);
+                }
               },
               child: Icon(
                 mission.isCompleted ? Icons.check_circle_rounded : Icons.circle_outlined,
@@ -452,8 +459,11 @@ class HomeScreen extends ConsumerWidget {
             child: Row(
               children: [
                 GestureDetector(
-                  onTap: () {
-                    ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                  onTap: () async {
+                    final newLevel = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                    if (newLevel != null && context.mounted) {
+                      showLevelUpCelebration(context, newLevel);
+                    }
                   },
                   child: Icon(
                     mission.isCompleted ? Icons.check_circle_rounded : Icons.circle_outlined,

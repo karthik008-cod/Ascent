@@ -7,6 +7,7 @@ import '../../data/models/mission.dart';
 import '../widgets/add_mission_sheet.dart';
 import '../widgets/filter_sort_bar.dart';
 import '../widgets/settings_drawer.dart';
+import '../widgets/level_up_celebration.dart';
 
 class PlannerScreen extends ConsumerWidget {
   const PlannerScreen({super.key});
@@ -145,8 +146,11 @@ class PlannerScreen extends ConsumerWidget {
             child: Row(
               children: [
                 GestureDetector(
-                  onTap: () {
-                    ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                  onTap: () async {
+                    final newLevel = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                    if (newLevel != null && context.mounted) {
+                      showLevelUpCelebration(context, newLevel);
+                    }
                   },
                   child: Icon(
                     mission.isCompleted ? Icons.check_circle_rounded : Icons.circle_outlined,

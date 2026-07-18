@@ -27,20 +27,23 @@ class MissionNotifier extends StateNotifier<AsyncValue<List<Mission>>> {
     }
   }
 
-  Future<void> toggleMissionStatus(Mission mission) async {
+  /// Returns the new level if a level-up occurred, null otherwise.
+  Future<int?> toggleMissionStatus(Mission mission) async {
     final repository = ref.read(missionRepositoryProvider);
     mission.isCompleted = !mission.isCompleted;
     await repository.saveMission(mission);
     
+    int? newLevel;
     // XP Calculation & Notification Cancellation
     if (mission.isCompleted) {
-      await ref.read(userStatsNotifierProvider.notifier).addXp(mission.xpReward);
+      newLevel = await ref.read(userStatsNotifierProvider.notifier).addXp(mission.xpReward);
       await NotificationService.cancelNotification(mission.id);
     } else {
       await ref.read(userStatsNotifierProvider.notifier).removeXp(mission.xpReward);
     }
     
     await _loadMissions();
+    return newLevel;
   }
 
   Future<void> addMission(Mission mission) async {

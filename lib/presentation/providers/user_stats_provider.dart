@@ -5,12 +5,13 @@ import 'data_providers.dart';
 
 class LevelSystem {
   /// Total cumulative XP needed to reach [level].
-  /// Uses BGMI / PUBG exponential rank curve: each step requires (100 * i^1.45).
+  /// Calibrated so a moderate user (1 Main + 2 Side + 2 Routine = 240 XP/day)
+  /// reaches level 50 in ~6 months. Levels are unlimited.
   static int getTotalXpForLevel(int level) {
     if (level <= 1) return 0;
     int cumulative = 0;
     for (int i = 1; i < level; i++) {
-      int stepXp = (100 * math.pow(i, 1.45)).round();
+      int stepXp = (25 * math.pow(i, 1.1)).round();
       cumulative += stepXp;
     }
     return cumulative;
@@ -28,7 +29,7 @@ class LevelSystem {
 
   /// Returns XP required inside current level interval to reach next level.
   static int getXpStepForCurrentLevel(int level) {
-    return (100 * math.pow(level, 1.45)).round();
+    return (25 * math.pow(level, 1.1)).round();
   }
 
   /// Returns total XP required for next level (`getTotalXpForLevel(level + 1)`).
@@ -66,16 +67,23 @@ class UserStatsNotifier extends StateNotifier<AsyncValue<UserStats>> {
     }
   }
 
-  Future<void> addXp(int xp) async {
+  /// Returns the new level if a level-up occurred, null otherwise.
+  Future<int?> addXp(int xp) async {
     final repository = ref.read(statsRepositoryProvider);
     if (state.value != null) {
       final stats = state.value!;
+      final oldLevel = stats.currentLevel;
       stats.totalXp += xp;
       stats.currentLevel = LevelSystem.calculateLevel(stats.totalXp);
       
       await repository.saveUserStats(stats);
       state = AsyncValue.data(stats);
+
+      if (stats.currentLevel > oldLevel) {
+        return stats.currentLevel;
+      }
     }
+    return null;
   }
   
   Future<void> removeXp(int xp) async {
