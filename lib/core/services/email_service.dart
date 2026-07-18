@@ -6,7 +6,7 @@ class EmailService {
   // Use localhost for local development, and override for production via dart-define
   static const String _apiUrl = String.fromEnvironment(
     'API_URL', 
-    defaultValue: 'http://localhost:3000/api/send-otp'
+    defaultValue: 'http://127.0.0.1:3000/api/send-otp'
   );
 
   static Future<bool> sendOtpEmail(String recipientEmail, String otp) async {
