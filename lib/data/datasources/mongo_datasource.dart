@@ -19,6 +19,13 @@ class MongoDataSource {
   }
 
   // --- Auth ---
+  Future<bool> checkUserExists(String email) async {
+    await connect();
+    final usersCollection = _db!.collection('users');
+    final existingUser = await usersCollection.findOne({'email': email});
+    return existingUser != null;
+  }
+
   Future<Map<String, dynamic>?> signUp(String email, String password, String name) async {
     await connect();
     final usersCollection = _db!.collection('users');
@@ -51,6 +58,22 @@ class MongoDataSource {
     }
     
     // Ensure _id is treated as a string for SharedPreferences
+    final Map<String, dynamic> normalizedUser = Map<String, dynamic>.from(user);
+    if (normalizedUser['_id'] is ObjectId) {
+       normalizedUser['_id'] = (normalizedUser['_id'] as ObjectId).toHexString();
+    }
+    return normalizedUser;
+  }
+  
+  Future<Map<String, dynamic>?> signInWithEmailOnly(String email) async {
+    await connect();
+    final usersCollection = _db!.collection('users');
+    
+    final user = await usersCollection.findOne({'email': email});
+    if (user == null) {
+      throw Exception('User not found');
+    }
+    
     final Map<String, dynamic> normalizedUser = Map<String, dynamic>.from(user);
     if (normalizedUser['_id'] is ObjectId) {
        normalizedUser['_id'] = (normalizedUser['_id'] as ObjectId).toHexString();
