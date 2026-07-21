@@ -1,0 +1,399 @@
+# ASCENT — Gameplay Bible (Version 1.0)
+
+---
+
+# Core Gameplay Loop
+
+Every day follows the same simple loop:
+
+1. Open Ascent.
+2. Visit your companion at the current campsite.
+3. Plan today's expedition by choosing tasks.
+4. Complete tasks in real life.
+5. Watch your companion climb after each completed task.
+6. Reach today's campsite.
+7. Relax and prepare for tomorrow.
+
+Simple to understand.
+
+Deep to experience.
+
+---
+
+# Daily Expedition
+
+Every day generates one expedition.
+
+An expedition is today's journey.
+
+It has:
+
+* A starting campsite
+* A destination campsite
+* A beautiful trail
+* Scenic moments along the way
+
+The destination is always reachable.
+
+No impossible days.
+
+---
+
+# Tasks
+
+Tasks are not "todos."
+
+They are promises to yourself.
+
+Examples:
+
+* Workout
+* Study Cryptography
+* Build Ascent
+* Read 20 pages
+* Drink water
+* Call parents
+* Practice Flutter
+
+Every completed promise becomes one step forward.
+
+---
+
+# Completing a Task
+
+When a task is marked complete:
+
+The companion:
+
+* Smiles gently.
+* Takes a meaningful step.
+* The environment subtly reacts.
+* The completed section of the trail becomes part of the journey forever.
+
+Completion should feel satisfying without becoming flashy.
+
+---
+
+# Daily Completion
+
+If every task is completed:
+
+The companion reaches camp.
+
+Builds the tent.
+
+Lights the fire.
+
+Places the backpack down.
+
+Looks at the sunset.
+
+The day ends peacefully.
+
+---
+
+# Partial Completion
+
+If only some tasks are completed:
+
+The companion camps wherever they reached.
+
+No disappointment.
+
+No warning.
+
+Tomorrow simply continues from there.
+
+---
+
+# Missed Days
+
+Missing one day...
+
+One week...
+
+Or even one month...
+
+Changes nothing.
+
+The companion simply waits.
+
+The first screen says:
+
+"Welcome back."
+
+No streak loss.
+
+No punishment.
+
+No guilt.
+
+---
+
+# Progress
+
+Progress is measured through:
+
+* Distance climbed
+* Altitude reached
+* Memories collected
+* Regions explored
+* Journal entries
+* Personal growth
+
+Never by competing with others.
+
+---
+
+# Milestones
+
+Occasionally, the mountain celebrates progress.
+
+Examples:
+
+* Reach a waterfall.
+* Cross a suspension bridge.
+* Enter a new forest.
+* Witness the first snowfall.
+* Watch sunrise above the clouds.
+
+Milestones are experiences.
+
+Not trophies.
+
+---
+
+# Discoveries
+
+While climbing, users occasionally discover:
+
+* Hidden caves
+* Scenic viewpoints
+* Rare flowers
+* Ancient journals
+* Crystal formations
+* Forgotten campsites
+
+These discoveries make every expedition feel unique.
+
+---
+
+# Memories
+
+Every meaningful moment becomes a memory.
+
+Examples:
+
+"The first snowfall."
+
+"The longest expedition."
+
+"The day you finished your exams."
+
+"The sunrise above the clouds."
+
+These memories become part of the user's journey.
+
+---
+
+# Rest Days
+
+Sometimes growth means resting.
+
+Users may intentionally mark a day as:
+
+Rest Day
+
+The companion stays at camp.
+
+Reads.
+
+Drinks coffee.
+
+Watches nature.
+
+The app celebrates healthy recovery.
+
+---
+
+# Long Tasks
+
+Large goals can be divided into stages.
+
+Example:
+
+Build Ascent
+
+□ Research
+
+□ Design
+
+□ Flutter
+
+□ Testing
+
+□ Release
+
+Each completed stage advances the expedition.
+
+---
+
+# Habits
+
+Habits are recurring promises.
+
+Examples:
+
+Exercise
+
+Meditation
+
+Reading
+
+Learning
+
+Calling family
+
+Each occurrence contributes naturally to the journey.
+
+No pressure to maintain streaks.
+
+---
+
+# Goals
+
+Long-term goals exist above daily tasks.
+
+Examples:
+
+Become a Flutter Developer
+
+Learn Cybersecurity
+
+Read 20 Books
+
+Run a Marathon
+
+Daily promises slowly build these larger dreams.
+
+---
+
+# Reflection
+
+Every evening, the user is invited—not forced—to answer:
+
+"What made today meaningful?"
+
+The answer becomes part of the personal journal.
+
+---
+
+# Weekly Reflection
+
+At the end of each week:
+
+The companion revisits the week's journey.
+
+The app highlights:
+
+Places visited.
+
+Promises kept.
+
+Memories made.
+
+The focus is reflection, not statistics.
+
+---
+
+# Monthly Reflection
+
+At the end of every month:
+
+The user sees:
+
+The path climbed.
+
+New regions explored.
+
+Journal highlights.
+
+Beautiful moments.
+
+The goal is to appreciate progress over time.
+
+---
+
+# Failure
+
+Ascent has no failure state.
+
+Only different amounts of progress.
+
+Every step counts.
+
+---
+
+# Competition
+
+There are:
+
+No leaderboards.
+
+No rankings.
+
+No comparisons.
+
+The only mountain that matters is your own.
+
+---
+
+# Rewards
+
+Rewards are emotional rather than material.
+
+Examples:
+
+A sunrise.
+
+A hidden meadow.
+
+A peaceful campsite.
+
+A journal entry.
+
+A new memory.
+
+A breathtaking viewpoint.
+
+The experience is the reward.
+
+---
+
+# Ultimate Goal
+
+The objective is not to finish the mountain.
+
+The objective is to enjoy climbing it.
+
+---
+
+# Gameplay Principles
+
+Every mechanic must answer "Yes" to these questions:
+
+Does it encourage consistency?
+
+Does it reduce guilt?
+
+Does it feel meaningful?
+
+Does it respect the user's pace?
+
+Does it strengthen the emotional bond with the companion?
+
+Does it make the journey more beautiful?
+
+If the answer to any question is "No,"
+
+the feature does not belong in Ascent.

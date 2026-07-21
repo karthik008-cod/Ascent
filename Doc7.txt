@@ -1,0 +1,540 @@
+# ASCENT — UI/UX Bible (Version 1.0)
+
+---
+
+# Purpose
+
+The interface of Ascent exists to disappear.
+
+Users should never feel like they are navigating an application.
+
+They should feel like they are stepping into their own mountain.
+
+The UI should be emotionally calming, visually beautiful, and effortless to understand.
+
+Every screen should answer one question:
+
+**"What should I do next?"**
+
+Nothing more.
+
+---
+
+# Design Philosophy
+
+The interface should feel like:
+
+* Calm
+* Spacious
+* Premium
+* Warm
+* Natural
+* Minimal
+* Alive
+
+The interface should never feel:
+
+* Busy
+* Corporate
+* Mechanical
+* Overwhelming
+* Distracting
+* Gamified
+
+---
+
+# Visual Identity
+
+The entire application is inspired by nature.
+
+Every element should borrow from mountains, forests, wood, stone, clouds, sunrise, rivers, and hiking equipment.
+
+Rounded shapes should dominate.
+
+Sharp edges should be avoided.
+
+Nothing should feel aggressive.
+
+---
+
+# Design Language
+
+The interface should communicate through:
+
+* Large illustrations
+* Beautiful spacing
+* Gentle animations
+* Soft shadows
+* Natural colors
+* Clear typography
+
+Instead of information density.
+
+---
+
+# Layout Principles
+
+Every screen follows the same structure:
+
+1. Hero section
+2. Primary content
+3. Primary action
+4. Secondary actions
+
+The user's attention should naturally flow from top to bottom.
+
+---
+
+# Navigation
+
+Maximum of five primary tabs.
+
+Recommended navigation:
+
+* Journey
+* Today
+* Journal
+* Discover
+* Profile
+
+No hamburger menu.
+
+No hidden navigation.
+
+Everything important should be reachable within two taps.
+
+---
+
+# White Space
+
+White space is not empty.
+
+It creates peace.
+
+Every screen should breathe.
+
+Avoid filling every corner.
+
+Users should never feel visually exhausted.
+
+---
+
+# Typography
+
+Typography should feel human.
+
+Titles:
+
+Large
+
+Confident
+
+Elegant
+
+Body:
+
+Simple
+
+Readable
+
+Comfortable
+
+Buttons:
+
+Short.
+
+Action-oriented.
+
+Never verbose.
+
+---
+
+# Color Philosophy
+
+Colors should communicate emotion.
+
+Instead of using colors for decoration.
+
+Green
+
+Growth.
+
+Blue
+
+Peace.
+
+Brown
+
+Stability.
+
+Orange
+
+Warmth.
+
+White
+
+Clarity.
+
+Dark Grey
+
+Depth.
+
+Red should only appear for destructive actions.
+
+Never for productivity.
+
+---
+
+# Icons
+
+Icons should be:
+
+Rounded.
+
+Simple.
+
+Recognizable.
+
+Friendly.
+
+Avoid technical-looking icon packs.
+
+Icons should feel handcrafted.
+
+---
+
+# Cards
+
+Cards should resemble travel journal pages.
+
+Soft corners.
+
+Subtle shadows.
+
+Comfortable spacing.
+
+Cards should never feel like spreadsheets.
+
+---
+
+# Buttons
+
+Buttons should invite interaction.
+
+Primary buttons:
+
+Filled.
+
+Rounded.
+
+Comfortable.
+
+Secondary buttons:
+
+Outlined or tonal.
+
+Never use tiny touch targets.
+
+Every button should feel satisfying to press.
+
+---
+
+# Animations
+
+Animation philosophy:
+
+Purpose over spectacle.
+
+Animations should communicate:
+
+Progress.
+
+State changes.
+
+Emotion.
+
+Success.
+
+Transitions.
+
+Nothing should animate without meaning.
+
+---
+
+# Screen Transitions
+
+Transitions should feel like walking forward.
+
+Not teleporting.
+
+Slow enough to feel elegant.
+
+Fast enough to avoid frustration.
+
+---
+
+# Companion Placement
+
+The companion is the emotional center of the interface.
+
+Whenever possible,
+
+The companion should remain visible.
+
+Users should immediately know where their companion is.
+
+---
+
+# Home Screen
+
+The first screen should answer:
+
+Where am I?
+
+What should I do today?
+
+How is my companion?
+
+How far have I come?
+
+Nothing else.
+
+---
+
+# Task Screen
+
+Focus entirely on today's expedition.
+
+No unnecessary statistics.
+
+No clutter.
+
+One tap to complete.
+
+One tap to edit.
+
+One tap to add.
+
+Fast.
+
+Simple.
+
+Beautiful.
+
+---
+
+# Journal Screen
+
+Feels like opening a handwritten notebook.
+
+Warm colors.
+
+Comfortable reading.
+
+Large margins.
+
+The focus is memories, not analytics.
+
+---
+
+# Discover Screen
+
+Encourages curiosity.
+
+Beautiful scenery.
+
+Hidden locations.
+
+Past discoveries.
+
+Future destinations.
+
+Should inspire exploration.
+
+---
+
+# Profile Screen
+
+Shows:
+
+Journey.
+
+Altitude.
+
+Memories.
+
+Achievements.
+
+Customization.
+
+Everything here should tell a story.
+
+Not display numbers.
+
+---
+
+# Empty States
+
+An empty screen should never feel empty.
+
+Examples:
+
+"No tasks yet."
+
+Instead:
+
+"The trail is waiting for today's first promise."
+
+No journal entries:
+
+"Every great journey begins with a single memory."
+
+---
+
+# Loading States
+
+Loading should feel alive.
+
+Examples:
+
+Companion checking the map.
+
+Campfire flickering.
+
+Bird flying.
+
+Cloud moving.
+
+Avoid generic loading spinners whenever possible.
+
+---
+
+# Notifications
+
+Notifications should feel like invitations.
+
+Never commands.
+
+Examples:
+
+"The mountain is beautiful today."
+
+"Your companion packed the backpack."
+
+"Ready for another step?"
+
+Never:
+
+"You missed your task."
+
+"You're falling behind."
+
+---
+
+# Accessibility
+
+The interface should support everyone.
+
+Large touch targets.
+
+Readable text.
+
+High contrast.
+
+Screen reader compatibility.
+
+Reduced motion support.
+
+Color should never be the only indicator.
+
+---
+
+# Haptics
+
+Subtle haptic feedback for:
+
+Task completion.
+
+Milestones.
+
+Reaching camp.
+
+Unlocking memories.
+
+Never excessive.
+
+---
+
+# Sound
+
+Minimal.
+
+Natural.
+
+Peaceful.
+
+Examples:
+
+Footsteps.
+
+Birds.
+
+Fire crackling.
+
+Wind.
+
+Water.
+
+Silence is equally important.
+
+---
+
+# Performance
+
+Animations must remain smooth.
+
+Target:
+
+60 FPS minimum.
+
+120 FPS where supported.
+
+Fast startup.
+
+Instant interactions.
+
+Beautiful performance is part of beautiful design.
+
+---
+
+# Emotional Goal
+
+When someone opens Ascent they should think:
+
+"This place feels peaceful."
+
+When they close it they should think:
+
+"I can't wait to continue tomorrow."
+
+---
+
+# UI/UX Principles
+
+Every interface decision must answer "Yes" to these questions:
+
+Does it reduce cognitive load?
+
+Does it make the next action obvious?
+
+Does it strengthen the emotional connection?
+
+Does it feel calm?
+
+Does it respect the user's attention?
+
+Does it help users spend more time living rather than using the app?
+
+If the answer is "No,"
+
+the design should be reconsidered.

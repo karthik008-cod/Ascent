@@ -1,0 +1,374 @@
+# ASCENT — World Bible (Version 1.0)
+
+---
+
+# Purpose
+
+The world of Ascent is not merely a background.
+
+It is a living reflection of the user's journey.
+
+Every mountain, trail, sunrise, snowfall, bird, flower, and campsite should remind the user that progress is beautiful.
+
+The world should always feel calm, peaceful, inspiring, and full of hope.
+
+---
+
+# World Philosophy
+
+The mountain is alive.
+
+It remembers.
+
+It grows with the user.
+
+It never judges.
+
+It patiently waits.
+
+Every time the user opens Ascent, it should feel like returning to a familiar place.
+
+---
+
+# The Endless Mountain
+
+The mountain has no final summit.
+
+Every peak reveals another.
+
+Growth never ends.
+
+Progress is measured by altitude rather than levels.
+
+The mountain symbolizes lifelong personal growth.
+
+---
+
+# Daily Expedition
+
+Every day is a new expedition.
+
+The companion begins from yesterday's campsite.
+
+Today's tasks become today's trail.
+
+Every completed task moves the companion one meaningful step forward.
+
+At the end of the day:
+
+If today's route is completed:
+
+* Reach campsite
+* Build camp
+* Relax
+* Watch the sunset
+* Sleep
+
+If today's route is incomplete:
+
+* Camp wherever the journey paused
+* Continue tomorrow from the same place
+
+No progress is ever lost.
+
+---
+
+# Regions
+
+The mountain changes naturally over time.
+
+Possible regions include:
+
+• Grasslands
+
+• Pine Forests
+
+• Flower Valleys
+
+• Waterfalls
+
+• Rocky Cliffs
+
+• Bamboo Forests
+
+• Misty Hills
+
+• Snow Mountains
+
+• Frozen Lakes
+
+• Ice Caves
+
+• Cloud Bridges
+
+• Star Peaks
+
+• Ancient Ruins
+
+• Crystal Valleys
+
+• Volcano Ridge
+
+Each region introduces:
+
+* Different colors
+* Different wildlife
+* Different ambient sounds
+* Different weather
+* Different atmosphere
+
+Every region should feel memorable.
+
+---
+
+# Dynamic Trails
+
+No two expeditions should feel identical.
+
+Trail variations:
+
+* Narrow paths
+* Wooden bridges
+* Stone stairs
+* River crossings
+* Rope bridges
+* Small caves
+* Cliff edges
+* Open fields
+* Forest tunnels
+
+Every trail should encourage curiosity.
+
+---
+
+# Campsites
+
+A campsite is the reward for today's effort.
+
+Every completed day ends with peace.
+
+Possible campsite objects:
+
+* Tent
+* Campfire
+* Sleeping bag
+* Lantern
+* Wooden bench
+* Backpack
+* Coffee mug
+* Compass
+* Plants
+* Small flags
+
+The campsite slowly grows over months and years.
+
+It becomes the user's second home.
+
+---
+
+# Weather
+
+Weather changes naturally.
+
+Possible weather:
+
+* Sunny
+* Cloudy
+* Rain
+* Snow
+* Wind
+* Fog
+
+Weather affects animations only.
+
+Never gameplay.
+
+---
+
+# Time
+
+The world follows real time.
+
+Morning
+
+Afternoon
+
+Sunset
+
+Night
+
+Opening Ascent at different times creates different moods.
+
+---
+
+# Seasons
+
+Spring
+
+Summer
+
+Autumn
+
+Winter
+
+Seasonal changes include:
+
+* Tree colors
+* Flowers
+* Snow
+* Rivers
+* Wildlife
+* Lighting
+
+The world should evolve with the calendar.
+
+---
+
+# Wildlife
+
+Animals are companions of the mountain.
+
+Possible wildlife:
+
+* Birds
+* Eagles
+* Foxes
+* Deer
+* Rabbits
+* Butterflies
+* Fireflies
+* Squirrels
+* Owls
+* Mountain goats
+
+Animals should appear naturally.
+
+Never as collectibles.
+
+---
+
+# Living Nature
+
+Nature is always moving.
+
+Examples:
+
+Trees sway.
+
+Grass moves.
+
+Clouds drift.
+
+Leaves fall.
+
+Water flows.
+
+Snow falls.
+
+Fire flickers.
+
+Stars twinkle.
+
+Nothing should feel static.
+
+---
+
+# Hidden Discoveries
+
+Sometimes the mountain quietly reveals surprises.
+
+Examples:
+
+* Ancient journal pages
+* Crystal caves
+* Forgotten camps
+* Rare flowers
+* Hidden viewpoints
+* Stone statues
+* Wooden shrines
+* Old bridges
+* Secret trails
+
+These discoveries reward exploration rather than speed.
+
+---
+
+# Journal
+
+Every completed day becomes a memory.
+
+The companion writes one small journal entry.
+
+Examples:
+
+"Today's waterfall was beautiful."
+
+"The wind was stronger today."
+
+"We rested beneath the old pine."
+
+"Tomorrow we'll continue."
+
+The journal becomes the story of the user's life.
+
+---
+
+# Sound Design
+
+The world should sound peaceful.
+
+Examples:
+
+Birds singing
+
+Wind
+
+Footsteps
+
+Water
+
+Rain
+
+Campfire
+
+Leaves
+
+Snow
+
+Silence
+
+Music should support emotions rather than dominate them.
+
+---
+
+# Emotional Goal
+
+Every time someone opens Ascent they should think:
+
+"I'm home."
+
+Every time they close Ascent they should think:
+
+"I'm looking forward to tomorrow's climb."
+
+---
+
+# World Rules
+
+The world never punishes.
+
+The world never rushes.
+
+The world never becomes chaotic.
+
+The world always feels welcoming.
+
+The world always reflects hope.
+
+---
+
+# Final Principle
+
+The mountain is not where the journey happens.
+
+The mountain IS the journey.

@@ -1,0 +1,685 @@
+# ASCENT — Screen Bible (Version 1.0)
+
+---
+
+# Purpose
+
+This document defines every screen in Ascent.
+
+Each screen must have one primary purpose.
+
+If a screen tries to do too much, it should be redesigned.
+
+Users should never wonder:
+
+"What am I supposed to do here?"
+
+---
+
+# App Flow
+
+Splash
+
+↓
+
+Onboarding
+
+↓
+
+Authentication (Optional)
+
+↓
+
+Home (Journey)
+
+↓
+
+Daily Expedition
+
+↓
+
+Real Life
+
+↓
+
+Reflection
+
+↓
+
+Tomorrow
+
+---
+
+# 1. Splash Screen
+
+Purpose:
+
+Create a calm first impression.
+
+Content:
+
+* Ascent logo
+* Animated mountain silhouette
+* Slow sunrise
+* Gentle ambient sound (optional)
+
+Duration:
+
+2–3 seconds maximum.
+
+---
+
+# 2. Welcome / Onboarding
+
+Purpose:
+
+Introduce the philosophy of Ascent.
+
+Not features.
+
+Not tutorials.
+
+The onboarding should answer:
+
+* What is Ascent?
+* Why does it exist?
+* What kind of journey is this?
+
+Maximum:
+
+4–5 pages.
+
+Last page:
+
+"Your journey begins today."
+
+---
+
+# 3. Authentication
+
+Purpose:
+
+Allow users to save their journey.
+
+Options:
+
+* Continue with Google
+* Continue with Apple
+* Continue with Email
+* Continue as Guest
+
+Guest Mode should be fully functional.
+
+---
+
+# 4. Journey (Home)
+
+Purpose:
+
+This is the heart of Ascent.
+
+The user should immediately see:
+
+* Current mountain region
+* Companion
+* Today's campsite
+* Current trail
+* Time of day
+* Weather
+
+Below that:
+
+Today's expedition summary.
+
+Primary action:
+
+"Begin Today's Journey"
+
+Secondary actions remain minimal.
+
+---
+
+# 5. Today's Expedition
+
+Purpose:
+
+Plan today's climb.
+
+Sections:
+
+Today's Tasks
+
+Suggested Habits
+
+Progress on today's trail
+
+Estimated destination
+
+Primary CTA:
+
+Add Promise
+
+Task Card contains:
+
+Task Name
+
+Category
+
+Estimated duration
+
+Completion toggle
+
+Optional notes
+
+Everything should be editable with minimal taps.
+
+---
+
+# 6. Add Promise Screen
+
+Purpose:
+
+Create a meaningful promise.
+
+Fields:
+
+Title
+
+Category
+
+Estimated duration
+
+Repeat
+
+Reminder (optional)
+
+Notes (optional)
+
+The interface should remain simple.
+
+---
+
+# 7. Companion Screen
+
+Purpose:
+
+Spend time with your companion.
+
+Content:
+
+Current outfit
+
+Equipment
+
+Backpack
+
+Idle animations
+
+Weather reactions
+
+Customization
+
+No statistics.
+
+Just connection.
+
+---
+
+# 8. Camp Screen
+
+Purpose:
+
+Celebrate today's effort.
+
+Visible only after ending the expedition.
+
+Shows:
+
+Tent
+
+Campfire
+
+Today's journal
+
+Today's memories
+
+Today's discoveries
+
+Weather
+
+Sunset
+
+This screen should encourage users to pause before closing the app.
+
+---
+
+# 9. Journal
+
+Purpose:
+
+Record the story of the journey.
+
+Displays:
+
+Daily entries
+
+Photos (future)
+
+Companion notes
+
+Personal reflections
+
+Filters:
+
+Day
+
+Week
+
+Month
+
+Year
+
+---
+
+# 10. Memories
+
+Purpose:
+
+Display meaningful moments.
+
+Examples:
+
+First Sunrise
+
+First Snowfall
+
+100 Promises Kept
+
+Longest Expedition
+
+First Hidden Cave
+
+Memories should be visual.
+
+Not numerical.
+
+---
+
+# 11. Discover
+
+Purpose:
+
+Encourage exploration.
+
+Displays:
+
+Unlocked regions
+
+Hidden trails
+
+Viewpoints
+
+Wildlife discovered
+
+Landmarks
+
+Future destinations
+
+The screen should inspire curiosity.
+
+---
+
+# 12. Map
+
+Purpose:
+
+Visualize the journey.
+
+Shows:
+
+Entire mountain
+
+Completed trails
+
+Current location
+
+Future routes
+
+Regions
+
+Campsites
+
+The map should slowly expand over years.
+
+---
+
+# 13. Statistics
+
+Purpose:
+
+Reflect.
+
+Not compete.
+
+Displays:
+
+Journey distance
+
+Altitude
+
+Promises completed
+
+Active days
+
+Journal entries
+
+Regions explored
+
+Everything should be presented as a story.
+
+Never as pressure.
+
+---
+
+# 14. Profile
+
+Purpose:
+
+Represent the user's identity.
+
+Contains:
+
+Name
+
+Avatar
+
+Current companion
+
+Journey summary
+
+Favorite memories
+
+Customization
+
+Settings shortcut
+
+---
+
+# 15. Settings
+
+Contains:
+
+Theme
+
+Notifications
+
+Accessibility
+
+Language
+
+Backup & Sync
+
+Privacy
+
+Account
+
+Support
+
+About Ascent
+
+Nothing unrelated.
+
+---
+
+# 16. Notifications Center
+
+Purpose:
+
+Store previous notifications.
+
+Examples:
+
+Today's sunrise.
+
+Journey milestones.
+
+Memory unlocked.
+
+Sync completed.
+
+Never promotional content.
+
+---
+
+# 17. Search
+
+Purpose:
+
+Quickly find:
+
+Tasks
+
+Journal entries
+
+Memories
+
+Discoveries
+
+Settings
+
+Fast.
+
+Instant.
+
+---
+
+# 18. Achievements
+
+Purpose:
+
+Celebrate meaningful milestones.
+
+Not trophies.
+
+Examples:
+
+Walked Through Every Season
+
+Finished Your First Book
+
+Completed 365 Promises
+
+Reached the Clouds
+
+Each achievement tells a story.
+
+---
+
+# 19. Customization
+
+Purpose:
+
+Personalize the journey.
+
+Sections:
+
+Companion
+
+Tent
+
+Backpack
+
+Lantern
+
+Campfire
+
+Scarf
+
+Hat
+
+Walking Stick
+
+Future themes
+
+Changes should instantly preview.
+
+---
+
+# 20. Region Introduction
+
+Whenever entering a new region:
+
+Pause gameplay.
+
+Play a cinematic.
+
+Display region artwork.
+
+Show region name.
+
+Reveal ambient sounds.
+
+Then continue naturally.
+
+This creates memorable moments.
+
+---
+
+# 21. Reflection
+
+Appears after finishing today's expedition.
+
+Questions:
+
+What made today meaningful?
+
+What are you proud of?
+
+Anything you'd like to remember?
+
+Optional.
+
+Never required.
+
+---
+
+# 22. Offline Screen
+
+Purpose:
+
+Reassure users.
+
+Message example:
+
+"The mountain is still here.
+
+We'll synchronize everything once you're connected again."
+
+Users should still have access to nearly every feature.
+
+---
+
+# 23. Error Screen
+
+Purpose:
+
+Reduce frustration.
+
+Friendly illustrations.
+
+Simple explanation.
+
+Retry button.
+
+Never expose technical jargon.
+
+---
+
+# 24. Empty States
+
+Every empty screen should inspire action.
+
+Examples:
+
+No tasks.
+
+"The trail begins with one promise."
+
+No journal.
+
+"Today's story hasn't been written yet."
+
+No memories.
+
+"The mountain is waiting to surprise you."
+
+---
+
+# Navigation Structure
+
+Bottom Navigation
+
+Journey
+
+Today
+
+Discover
+
+Journal
+
+Profile
+
+Floating Action Button
+
+Add Promise
+
+No nested complexity for primary flows.
+
+---
+
+# Global Components
+
+Available throughout the app:
+
+Mini Companion
+
+Weather
+
+Current Time
+
+Journey Progress
+
+Quick Add
+
+Notification Badge
+
+All should remain visually lightweight.
+
+---
+
+# Screen Design Rules
+
+Every screen must answer these questions:
+
+What is this screen's single purpose?
+
+What is the primary action?
+
+Can the user understand it within five seconds?
+
+Can unnecessary elements be removed?
+
+Does it feel calm?
+
+Does it strengthen the journey?
+
+If any answer is "No,"
+
+the screen should be redesigned.
+
+---
+
+# Final Principle
+
+Every screen in Ascent should feel like another page in the user's personal adventure—not another page in a productivity app.
+    

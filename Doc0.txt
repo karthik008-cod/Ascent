@@ -1,0 +1,132 @@
+North Star Document (Version 1)
+
+This is the document that every future design decision, feature, animation, and line of code must respect.
+
+1. What is Ascent?
+
+Ascent is a self-improvement journey disguised as an adventure.
+
+It transforms daily tasks into meaningful progress by letting users climb an endless mountain alongside a silent companion. Instead of rewarding productivity with points and streaks, Ascent rewards consistency with memories, exploration, and a growing world.
+
+The goal is not to make users complete more tasks.
+
+The goal is to help users enjoy becoming the person they want to be.
+
+2. Who is Ascent for?
+
+Ascent is built for people who:
+
+Start goals with excitement but struggle to stay consistent.
+Feel guilty after missing a day in traditional habit trackers.
+Want motivation without pressure.
+Prefer meaningful progress over meaningless numbers.
+Love games, exploration, and beautiful experiences.
+Want a calmer, healthier relationship with productivity.
+
+Ascent is NOT for users who only want a checklist.
+
+3. What problem does Ascent solve?
+
+Today's productivity apps often create pressure.
+
+Users chase streaks, points, and perfect days.
+
+One missed day feels like failure.
+
+Eventually, they stop opening the app.
+
+Ascent solves this by replacing pressure with progress.
+
+Instead of asking:
+
+"Did you finish everything?"
+
+Ascent asks:
+
+"How far did we climb today?"
+
+Every step matters.
+
+Every day matters.
+
+No day is wasted.
+
+4. What should users feel?
+
+Every session should leave the user feeling:
+
+🌄 Inspired
+💪 Motivated
+🌱 Hopeful
+😌 Peaceful
+❤️ Proud of today's effort
+✨ Excited for tomorrow
+
+Users should never feel:
+
+Guilty
+Ashamed
+Punished
+Overwhelmed
+Pressured
+5. Product Principles
+
+Every feature must satisfy these principles.
+
+Principle 1
+
+The mountain never judges.
+
+Principle 2
+
+Progress is always visible.
+
+Principle 3
+
+Celebrate effort, not perfection.
+
+Principle 4
+
+The companion is a friend, not a coach.
+
+Principle 5
+
+The world should feel alive.
+
+Principle 6
+
+The journey is more important than the destination.
+
+Principle 7
+
+Customization tells a story, not a status.
+
+Principle 8
+
+Beauty should never reduce simplicity.
+
+Principle 9
+
+Every animation should have meaning.
+
+Nothing moves just because it looks cool.
+
+Every movement reinforces progress.
+
+Principle 10
+
+Ascent should feel like returning home.
+
+Opening the app should feel like visiting your companion after a long day.
+
+6. Success Statement
+
+If someone uses Ascent every day for one year, we want them to say:
+
+"Ascent didn't make me more productive. It changed the way I think about progress."
+
+7. One Sentence
+
+If Ascent had to be described in one sentence:
+
+"Climb your own mountain, one meaningful step at a time."

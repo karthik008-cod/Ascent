@@ -1,0 +1,356 @@
+# ASCENT — Design Bible (Version 1.0)
+
+---
+
+# Purpose
+
+The Design Bible defines the identity of Ascent.
+
+It is the single source of truth for how the product should look, feel, behave, and evolve.
+
+Every future feature, screen, animation, illustration, interaction, and line of code must align with this document.
+
+If a new idea contradicts this Design Bible, the design should be reconsidered before implementation.
+
+---
+
+# Product Vision
+
+Ascent is not a productivity app.
+
+It is a personal growth journey where every completed task becomes a meaningful step up an endless mountain.
+
+Instead of managing tasks, Ascent helps users build a healthier relationship with progress.
+
+The destination is never the goal.
+
+The journey is.
+
+---
+
+# Core Philosophy
+
+Ascent is built on one simple belief:
+
+Small, consistent actions create extraordinary change.
+
+The app should encourage users to focus on today's progress rather than tomorrow's destination.
+
+Progress should feel meaningful, peaceful, and rewarding.
+
+Never stressful.
+
+---
+
+# Design Principles
+
+Every design decision must follow these principles.
+
+### Progress Over Perfection
+
+Celebrate every step.
+
+Never expect perfection.
+
+---
+
+### Encourage, Never Pressure
+
+The app should inspire action.
+
+Never create guilt or anxiety.
+
+---
+
+### Beauty With Purpose
+
+Every visual element should support the experience.
+
+Decoration should never distract.
+
+---
+
+### Simplicity Above Complexity
+
+Powerful features should remain easy to understand.
+
+Users should never feel overwhelmed.
+
+---
+
+### Emotion Before Efficiency
+
+A slightly slower but emotionally meaningful interaction is better than a fast but forgettable one.
+
+---
+
+### Every Detail Tells A Story
+
+Animations.
+
+Illustrations.
+
+Weather.
+
+Equipment.
+
+Journal entries.
+
+Everything should reinforce the user's journey.
+
+---
+
+# Emotional Goals
+
+After using Ascent, users should feel:
+
+* Proud
+* Calm
+* Motivated
+* Hopeful
+* Peaceful
+* Inspired
+
+Users should never feel:
+
+* Guilty
+* Punished
+* Ashamed
+* Stressed
+* Left behind
+* Forced
+
+---
+
+# User Experience
+
+Opening Ascent should feel like returning to a familiar place.
+
+Completing tasks should feel satisfying.
+
+Exploring should feel relaxing.
+
+Closing the app should leave the user excited for tomorrow's climb.
+
+The experience should feel calm from beginning to end.
+
+---
+
+# The Journey
+
+The mountain represents life.
+
+The trail represents today.
+
+Tasks represent today's effort.
+
+The companion represents quiet support.
+
+The campsite represents rest.
+
+The backpack represents memories.
+
+Everything exists for a reason.
+
+Nothing is purely decorative.
+
+---
+
+# Product Identity
+
+Ascent should feel:
+
+* Warm
+* Peaceful
+* Inspiring
+* Hopeful
+* Natural
+* Minimal
+* Timeless
+
+It should never feel:
+
+* Corporate
+* Competitive
+* Noisy
+* Overstimulating
+* Artificial
+
+---
+
+# Storytelling
+
+Ascent tells stories without words.
+
+The world itself communicates progress.
+
+Examples include:
+
+* Changing weather
+* Growing campsites
+* Worn equipment
+* Wildlife encounters
+* Seasonal changes
+* Quiet animations
+* Journal memories
+
+The product should rely more on visual storytelling than text.
+
+---
+
+# Reward Philosophy
+
+Rewards should celebrate effort.
+
+Never create addiction.
+
+Meaningful rewards include:
+
+* Beautiful places
+* Memories
+* Discoveries
+* Companion growth
+* Campsite improvements
+* Backpack keepsakes
+* New regions
+
+Rewards should feel personal rather than competitive.
+
+---
+
+# Failure Philosophy
+
+Failure does not exist.
+
+Missing tasks does not erase progress.
+
+Missing days does not remove achievements.
+
+There are no punishments.
+
+The mountain patiently waits.
+
+Users simply continue from where they stopped.
+
+---
+
+# Progress Philosophy
+
+Progress should always be visible.
+
+Examples:
+
+* Companion climbing
+* Increasing altitude
+* Journal history
+* Backpack memories
+* Growing campsite
+* New environments
+* Better equipment
+
+Users should never wonder whether they are improving.
+
+---
+
+# Accessibility
+
+Ascent should be welcoming to everyone.
+
+Design should prioritize:
+
+* Readability
+* Clear navigation
+* Comfortable colors
+* Simple interactions
+* Large touch targets
+* Smooth animations
+* Reduced visual clutter
+
+Accessibility is part of the experience.
+
+Not an afterthought.
+
+---
+
+# Long-Term Experience
+
+The app should remain enjoyable after:
+
+* One week
+* One month
+* Six months
+* One year
+* Five years
+
+The experience should evolve naturally without losing its simplicity.
+
+---
+
+# Feature Evaluation Rule
+
+Before adding any feature, ask:
+
+Does this make the journey more meaningful?
+
+If not, it should not be added.
+
+---
+
+# Non-Negotiables
+
+Ascent must never include:
+
+* Endless notifications
+* Punishment systems
+* Fear of missing out
+* Aggressive streak mechanics
+* Manipulative engagement tactics
+* Pay-to-progress systems
+* Competitive leaderboards
+* Advertisements that interrupt the experience
+
+The user's well-being always comes first.
+
+---
+
+# Design Language
+
+Ascent should communicate through:
+
+* Nature
+* Motion
+* Silence
+* Atmosphere
+* Discovery
+* Memories
+* Progress
+
+Instead of numbers.
+
+Instead of pressure.
+
+Instead of urgency.
+
+---
+
+# Success
+
+Ascent succeeds when users return because they genuinely enjoy the journey.
+
+Not because they fear losing progress.
+
+Not because of notifications.
+
+Not because of streaks.
+
+But because climbing the mountain feels like coming home.
+
+---
+
+# Final Principle
+
+Ascent is not about completing more tasks.
+
+It is about becoming a better version of yourself...
+
+One meaningful step at a time.

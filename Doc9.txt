@@ -1,0 +1,643 @@
+# ASCENT — Technical Bible (Version 1.0)
+
+---
+
+# Purpose
+
+This document defines the technical foundation of Ascent.
+
+Every architectural decision should prioritize:
+
+* Simplicity
+* Scalability
+* Maintainability
+* Performance
+* Offline reliability
+* Beautiful user experience
+
+The technology should remain invisible to the user.
+
+---
+
+# Technology Stack
+
+## Framework
+
+Flutter (Latest Stable)
+
+Reason:
+
+* Cross-platform
+* Excellent animation support
+* High performance
+* Single codebase
+* Strong ecosystem
+
+---
+
+## Programming Language
+
+Dart
+
+---
+
+## State Management
+
+Riverpod
+
+Reason:
+
+* Compile-time safety
+* Predictable architecture
+* Easy testing
+* Scalable dependency injection
+* Minimal boilerplate
+
+---
+
+## Local Database
+
+Isar Database
+
+Purpose:
+
+* Offline-first storage
+* Fast local queries
+* Task management
+* Journal
+* Memories
+* User settings
+* Companion state
+
+---
+
+## Cloud Backend
+
+Firebase
+
+Services:
+
+* Authentication
+* Firestore
+* Cloud Storage
+* Cloud Functions
+* Crashlytics
+* Analytics
+* Remote Config
+* App Check
+
+---
+
+## Authentication
+
+Support:
+
+* Google
+* Apple
+* Email
+* Anonymous Guest Mode
+
+Guest users should be able to experience Ascent before creating an account.
+
+---
+
+## Folder Structure
+
+```
+lib/
+
+core/
+    constants/
+    themes/
+    router/
+    utils/
+    services/
+    errors/
+
+features/
+
+    home/
+    journey/
+    tasks/
+    companion/
+    journal/
+    memories/
+    discover/
+    profile/
+    settings/
+    authentication/
+
+shared/
+
+    widgets/
+    animations/
+    models/
+    extensions/
+
+data/
+
+    repositories/
+    datasource/
+    database/
+    firebase/
+
+main.dart
+```
+
+Feature-first architecture should be followed throughout the project.
+
+---
+
+# Architectural Pattern
+
+Clean Architecture
+
+Layers:
+
+Presentation
+
+↓
+
+Application
+
+↓
+
+Domain
+
+↓
+
+Data
+
+Every layer should have a single responsibility.
+
+---
+
+# Design Pattern
+
+Use:
+
+Repository Pattern
+
+Dependency Injection
+
+Use Cases
+
+Immutable Models
+
+Composition over inheritance.
+
+---
+
+# Navigation
+
+go_router
+
+Advantages:
+
+* Deep linking
+* Nested navigation
+* Type-safe routes
+* Scalable routing
+
+---
+
+# Dependency Injection
+
+Riverpod Providers
+
+Avoid global singleton classes whenever possible.
+
+---
+
+# Local Storage
+
+Use SharedPreferences only for:
+
+* Theme preference
+* First launch
+* Small settings
+
+Everything else belongs in Isar.
+
+---
+
+# Networking
+
+Use Dio.
+
+Reasons:
+
+* Interceptors
+* Better error handling
+* Upload support
+* Retry mechanisms
+
+---
+
+# API Design
+
+Every API call should pass through:
+
+Repository
+
+↓
+
+Datasource
+
+↓
+
+Network
+
+Never call APIs directly from UI.
+
+---
+
+# Offline First
+
+The app should remain fully usable without internet.
+
+Tasks.
+
+Journal.
+
+Companion.
+
+Journey.
+
+Animations.
+
+Customization.
+
+Everything works offline.
+
+Cloud synchronization occurs automatically.
+
+---
+
+# Synchronization
+
+When internet becomes available:
+
+1.
+
+Upload local changes.
+
+2.
+
+Resolve conflicts.
+
+3.
+
+Download updates.
+
+4.
+
+Refresh UI.
+
+Sync should happen silently.
+
+---
+
+# Error Handling
+
+Users should never see technical errors.
+
+Instead of:
+
+"HTTP 500"
+
+Use:
+
+"Looks like we couldn't reach the mountain right now."
+
+Retry gracefully.
+
+---
+
+# Logging
+
+Development:
+
+Detailed logs.
+
+Production:
+
+Crashlytics only.
+
+Sensitive information should never be logged.
+
+---
+
+# Performance Goals
+
+Cold Start:
+
+< 2 seconds
+
+Screen transitions:
+
+< 300 ms
+
+Animations:
+
+60 FPS minimum
+
+120 FPS where supported.
+
+No dropped frames during companion animations.
+
+---
+
+# Animation System
+
+Preferred hierarchy:
+
+Flutter Animations
+
+↓
+
+Rive
+
+↓
+
+Lottie
+
+Use Rive only when meaningful interaction is required.
+
+Avoid unnecessary animation libraries.
+
+---
+
+# Image Assets
+
+SVG:
+
+Icons
+
+Simple illustrations
+
+PNG/WebP:
+
+Textures
+
+Backgrounds
+
+Environment assets
+
+AVIF/WebP preferred for optimization.
+
+---
+
+# Audio
+
+Use:
+
+just_audio
+
+Audio categories:
+
+Ambient
+
+Footsteps
+
+Weather
+
+Campfire
+
+Wildlife
+
+UI interactions
+
+Support background audio interruption correctly.
+
+---
+
+# Notifications
+
+Firebase Cloud Messaging
+
+Local Notifications
+
+Use notifications sparingly.
+
+Quality over quantity.
+
+---
+
+# Security
+
+Never store secrets inside the app.
+
+Use:
+
+Firebase App Check
+
+Secure Storage
+
+HTTPS only
+
+Input validation
+
+Authentication checks
+
+Least privilege principle
+
+---
+
+# Environment Configuration
+
+Separate environments:
+
+Development
+
+Staging
+
+Production
+
+Never hardcode API keys.
+
+---
+
+# Testing Strategy
+
+Unit Tests
+
+Business logic.
+
+Repository layer.
+
+Use cases.
+
+Widget Tests
+
+Reusable widgets.
+
+Animations.
+
+Interactions.
+
+Integration Tests
+
+Authentication.
+
+Journey flow.
+
+Task completion.
+
+Offline synchronization.
+
+Golden Tests
+
+Visual consistency.
+
+---
+
+# Code Style
+
+Follow Effective Dart.
+
+Rules:
+
+Meaningful naming.
+
+Small functions.
+
+Single responsibility.
+
+Avoid deeply nested widgets.
+
+Extract reusable components.
+
+Prefer composition.
+
+No unnecessary comments.
+
+Code should explain itself.
+
+---
+
+# Accessibility
+
+Support:
+
+Screen readers.
+
+Large text.
+
+Reduced motion.
+
+High contrast.
+
+Semantic widgets.
+
+Keyboard navigation where applicable.
+
+---
+
+# Analytics
+
+Track only meaningful events.
+
+Examples:
+
+Journey Started
+
+Task Completed
+
+Reached Campsite
+
+Journal Written
+
+Discovery Found
+
+Never collect unnecessary personal data.
+
+Respect user privacy.
+
+---
+
+# Data Privacy
+
+Users own their journey.
+
+Allow export of:
+
+Tasks
+
+Journal
+
+Memories
+
+Progress
+
+Provide account deletion.
+
+Delete all cloud data upon request.
+
+---
+
+# Scalability
+
+Architecture should support future additions:
+
+Achievements
+
+Widgets
+
+Wearables
+
+Desktop
+
+Tablets
+
+Apple Watch
+
+Android Wear
+
+AI coaching (optional)
+
+Without major architectural changes.
+
+---
+
+# Build Quality
+
+Every release must satisfy:
+
+No crashes.
+
+No janky animations.
+
+No memory leaks.
+
+Fast startup.
+
+Smooth scrolling.
+
+Responsive UI.
+
+Offline reliability.
+
+---
+
+# Technical Principles
+
+Every technical decision must answer "Yes" to these questions:
+
+Is it maintainable?
+
+Is it scalable?
+
+Is it testable?
+
+Does it improve performance?
+
+Does it keep the app responsive?
+
+Does it protect user privacy?
+
+Does it support the long-term vision of Ascent?
+
+If the answer is "No,"
+
+choose a different solution.

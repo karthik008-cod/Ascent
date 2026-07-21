@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../presentation/screens/home_screen.dart';
-import '../../presentation/screens/planner_screen.dart';
-import '../../presentation/screens/progress_screen.dart';
-import '../../presentation/screens/profile_screen.dart';
-import '../../presentation/screens/main_scaffold.dart';
-import '../../presentation/screens/auth_screen.dart';
-import '../../presentation/screens/onboarding_screen.dart';
-import '../../presentation/providers/auth_provider.dart';
+import '../../features/journey/presentation/screens/home_screen.dart';
+import '../../features/tasks/presentation/screens/planner_screen.dart';
+import '../../features/progress/presentation/screens/progress_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/journey/presentation/screens/main_scaffold.dart';
+import '../../features/auth/presentation/screens/auth_screen.dart';
+import '../../features/journey/presentation/screens/onboarding_screen.dart';
+import '../../features/auth/presentation/providers/auth_provider.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 

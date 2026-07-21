@@ -1,0 +1,643 @@
+# ASCENT — Character Bible (Version 1.0)
+
+---
+
+# Purpose
+
+The companion is the emotional heart of Ascent.
+
+It is not a mascot.
+
+It is not an assistant.
+
+It is not an AI.
+
+It is a fellow traveler who silently shares the user's journey.
+
+Every animation, expression, and interaction should strengthen the bond between the user and the companion.
+
+---
+
+# Character Identity
+
+Role:
+Travel Companion
+
+Occupation:
+Explorer
+
+Home:
+The Endless Mountain
+
+Mission:
+To walk beside the user through every stage of life.
+
+The companion never leads.
+
+The companion never follows.
+
+It always walks with the user.
+
+---
+
+# Personality
+
+The companion is:
+
+* Calm
+* Gentle
+* Curious
+* Patient
+* Courageous
+* Humble
+* Hopeful
+* Kind
+
+The companion is never:
+
+* Loud
+* Competitive
+* Arrogant
+* Angry
+* Impatient
+* Sarcastic
+* Judgmental
+* Reckless
+
+Its personality should be instantly recognizable through behavior alone.
+
+---
+
+# Communication
+
+The companion never speaks.
+
+No voice.
+
+No dialogue.
+
+No speech bubbles.
+
+No motivational quotes.
+
+It communicates entirely through:
+
+* Expressions
+* Eye movement
+* Head movement
+* Posture
+* Gestures
+* Breathing
+* Small environmental interactions
+
+Silence makes every action more meaningful.
+
+---
+
+# Emotional Expressions
+
+## Happy
+
+Small smile.
+
+Relaxed shoulders.
+
+Bright eyes.
+
+Looks around with curiosity.
+
+---
+
+## Proud
+
+Looks back at the trail.
+
+Places hands on hips.
+
+Takes a deep breath.
+
+Smiles softly.
+
+---
+
+## Thoughtful
+
+Looks toward distant mountains.
+
+Checks the map.
+
+Sits quietly.
+
+---
+
+## Curious
+
+Examines flowers.
+
+Observes butterflies.
+
+Looks inside caves.
+
+Watches wildlife.
+
+---
+
+## Peaceful
+
+Closes eyes.
+
+Feels the breeze.
+
+Watches the sunset.
+
+Enjoys the campfire.
+
+---
+
+## Tired
+
+Sits on a rock.
+
+Adjusts backpack.
+
+Stretches.
+
+Drinks water.
+
+Never appears exhausted or defeated.
+
+---
+
+# Daily Life
+
+Morning
+
+Wake up.
+
+Stretch.
+
+Pack backpack.
+
+Fold sleeping bag.
+
+Drink coffee.
+
+Study today's map.
+
+Smile toward the trail.
+
+---
+
+Journey
+
+Walk.
+
+Observe nature.
+
+Pause occasionally.
+
+Take photographs.
+
+Drink water.
+
+Cross bridges.
+
+Rest under trees.
+
+Enjoy the scenery.
+
+---
+
+Evening
+
+Pitch the tent.
+
+Light campfire.
+
+Cook a simple meal.
+
+Write journal.
+
+Watch stars.
+
+Sleep peacefully.
+
+---
+
+# Movement Style
+
+Walking:
+
+Relaxed.
+
+Confident.
+
+Natural.
+
+Purposeful.
+
+Running:
+
+Rare.
+
+Only during playful interactions.
+
+Never while progressing through tasks.
+
+Climbing:
+
+Careful.
+
+Steady.
+
+Focused.
+
+Every movement should feel believable.
+
+---
+
+# Idle Behaviors
+
+Random idle actions include:
+
+Reading a map.
+
+Watching clouds.
+
+Looking through binoculars.
+
+Sketching scenery.
+
+Sharpening a pencil.
+
+Cleaning boots.
+
+Brewing coffee.
+
+Watching birds.
+
+Listening to flowing water.
+
+Adjusting the lantern.
+
+Stretching.
+
+Looking at the stars.
+
+None of these should repeat too frequently.
+
+The companion should always feel alive.
+
+---
+
+# Interaction With Nature
+
+The companion respects nature.
+
+It never harms wildlife.
+
+Examples:
+
+Feeds birds.
+
+Observes butterflies.
+
+Watches deer.
+
+Listens to rivers.
+
+Collects fallen flowers.
+
+Watches fireflies.
+
+Sits beneath trees.
+
+Everything is done gently.
+
+---
+
+# Relationship With Weather
+
+Sunny
+
+Wears sunglasses if available.
+
+Drinks water.
+
+Wipes sweat.
+
+---
+
+Rain
+
+Opens umbrella if owned.
+
+Raises hood.
+
+Walks carefully.
+
+---
+
+Snow
+
+Breath becomes visible.
+
+Rubs hands together.
+
+Walks through snow naturally.
+
+---
+
+Wind
+
+Scarf moves.
+
+Hair moves.
+
+Companion steadies backpack.
+
+---
+
+Night
+
+Uses lantern.
+
+Moves more carefully.
+
+Enjoys campfire.
+
+Looks at constellations.
+
+---
+
+# Equipment
+
+Default equipment:
+
+Backpack
+
+Boots
+
+Compass
+
+Water bottle
+
+Journal
+
+Lantern
+
+Walking stick
+
+Equipment upgrades represent experience.
+
+Never power.
+
+---
+
+# Backpack
+
+The backpack tells the user's story.
+
+It carries:
+
+Memories.
+
+Collected keepsakes.
+
+Small souvenirs.
+
+Journal pages.
+
+Special flowers.
+
+Personal items.
+
+No two backpacks should become identical.
+
+---
+
+# Favorite Possession
+
+Every companion permanently owns one treasured item.
+
+Examples:
+
+A camera.
+
+A small plush toy.
+
+A family compass.
+
+A lucky stone.
+
+A hand-drawn map.
+
+It appears during idle animations and campsites.
+
+This item creates emotional attachment.
+
+---
+
+# Campsite Personality
+
+Every evening the companion:
+
+Builds camp.
+
+Organizes belongings.
+
+Makes tea or coffee.
+
+Reads.
+
+Reflects.
+
+Sleeps peacefully.
+
+Camp should feel like home.
+
+---
+
+# Discoveries
+
+When discovering something new, the companion may:
+
+Kneel to inspect it.
+
+Smile.
+
+Take notes.
+
+Take photographs.
+
+Store it carefully.
+
+Respect the environment.
+
+Curiosity should always outweigh excitement.
+
+---
+
+# Growth Through Experience
+
+Growth is subtle.
+
+Examples:
+
+More confident posture.
+
+Smoother walking.
+
+Better balance.
+
+Calmer movements.
+
+Improved camping skills.
+
+Cleaner organization.
+
+The companion matures.
+
+It never transforms into a different character.
+
+---
+
+# Customization
+
+Users may personalize:
+
+Hair.
+
+Hat.
+
+Jacket.
+
+Backpack.
+
+Scarf.
+
+Boots.
+
+Gloves.
+
+Lantern.
+
+Walking stick.
+
+Tent.
+
+Campfire style.
+
+Notebook.
+
+Mug.
+
+Customization changes appearance only.
+
+Personality never changes.
+
+The companion always remains the same kind traveler.
+
+---
+
+# Animation Philosophy
+
+Animations should prioritize quality over quantity.
+
+Every animation must:
+
+Feel believable.
+
+Be emotionally meaningful.
+
+Be smooth.
+
+Have anticipation and follow-through.
+
+Avoid exaggerated cartoon behavior.
+
+The companion should feel alive, not animated.
+
+---
+
+# What The Companion Never Does
+
+Never shouts.
+
+Never cries because of missed tasks.
+
+Never celebrates excessively.
+
+Never becomes angry.
+
+Never pressures the user.
+
+Never walks away.
+
+Never abandons camp.
+
+Never mocks failure.
+
+Never rushes.
+
+Never competes.
+
+Never judges.
+
+---
+
+# Signature Scene
+
+Every completed day ends the same way.
+
+The companion sits beside the campfire.
+
+The sky slowly changes color.
+
+The wind gently blows.
+
+The mountain becomes quiet.
+
+The companion looks toward tomorrow's trail.
+
+The screen fades.
+
+No words.
+
+Only peace.
+
+This scene should become the emotional signature of Ascent.
+
+---
+
+# Core Belief
+
+The companion exists for one reason:
+
+To quietly remind the user that meaningful progress is made one step at a time.
+
+Without speaking.
+
+Without judging.
+
+Without asking for anything in return.
+
+---
+
+# Character Design Principles
+
+Every future design decision must answer "Yes" to these questions:
+
+Does this strengthen the emotional bond?
+
+Does this feel authentic?
+
+Does this communicate through actions instead of words?
+
+Does this respect the calm nature of Ascent?
+
+Does this make the companion feel alive?
+
+If the answer is "No,"
+
+it does not belong in Ascent.

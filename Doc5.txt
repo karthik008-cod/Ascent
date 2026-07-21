@@ -1,0 +1,377 @@
+# ASCENT — Psychology Bible (Version 1.0)
+
+---
+
+# Purpose
+
+Ascent is not designed to maximize screen time.
+
+It is designed to maximize meaningful progress in the user's real life.
+
+The app should become a quiet companion, not another source of digital addiction.
+
+The greatest success for Ascent is when users spend less time inside the app because they are spending more time living their lives.
+
+---
+
+# Core Psychological Philosophy
+
+People do not fail because they lack motivation.
+
+People fail because they associate self-improvement with pressure, guilt, perfection, and fear of failure.
+
+Ascent replaces these emotions with:
+
+* Hope
+* Curiosity
+* Calm
+* Pride
+* Consistency
+* Self-compassion
+
+The app should never make the user feel that they are "behind."
+
+There is no behind.
+
+There is only today.
+
+---
+
+# Identity Before Achievement
+
+Ascent is built around identity rather than outcomes.
+
+Instead of asking:
+
+"I need to finish this task."
+
+The user gradually begins thinking:
+
+"I am someone who shows up."
+
+Tasks are temporary.
+
+Identity lasts.
+
+Every completed promise is evidence of the person the user is becoming.
+
+---
+
+# Self-Compassion
+
+Missing a day is normal.
+
+Missing a week is normal.
+
+Life happens.
+
+Ascent never treats interruptions as failures.
+
+The user's worth is never measured by consistency.
+
+The app welcomes every return with warmth, never disappointment.
+
+---
+
+# Intrinsic Motivation
+
+Ascent avoids relying on external rewards.
+
+The real reward is:
+
+* Seeing your journey.
+* Feeling proud of today's effort.
+* Watching the companion continue climbing.
+* Building meaningful memories.
+
+The mountain is beautiful enough that users naturally want to continue exploring.
+
+---
+
+# Progress Visibility
+
+Human beings stay motivated when progress is visible.
+
+Ascent continuously shows progress through:
+
+* The changing landscape.
+* The companion's journey.
+* Campsites.
+* Memories.
+* Journal entries.
+* Altitude.
+
+Progress is experienced visually instead of numerically.
+
+---
+
+# Reducing Decision Fatigue
+
+The app should reduce mental effort.
+
+Users should never be overwhelmed with choices.
+
+The interface should answer one simple question:
+
+"What should I focus on today?"
+
+Everything else becomes secondary.
+
+---
+
+# Emotional Safety
+
+The app must always feel emotionally safe.
+
+It should never create anxiety through:
+
+* Countdown timers.
+* Fear of missing out.
+* Harsh reminders.
+* Negative messages.
+* Punishments.
+* Competitive pressure.
+
+Users should feel accepted exactly where they are.
+
+---
+
+# The Fresh Start Effect
+
+Every sunrise represents a new opportunity.
+
+Yesterday's unfinished journey does not become today's burden.
+
+Each day begins with hope.
+
+The app gently encourages the user to continue, never to make up for lost time.
+
+---
+
+# The Progress Principle
+
+Small wins build momentum.
+
+Completing one simple task can encourage another.
+
+For this reason:
+
+Every completed promise should feel meaningful, regardless of its size.
+
+No honest effort is "too small."
+
+---
+
+# Reflection Instead of Judgment
+
+At the end of each day, the app encourages reflection.
+
+Questions are open-ended.
+
+Examples:
+
+"What are you proud of today?"
+
+"What surprised you today?"
+
+"What would you like to continue tomorrow?"
+
+The app never asks:
+
+"Why didn't you finish?"
+
+Reflection creates awareness.
+
+Judgment creates avoidance.
+
+---
+
+# Habit Formation
+
+Habits are formed through repetition, not pressure.
+
+Ascent supports habits by making consistency enjoyable.
+
+The focus is:
+
+Showing up.
+
+Not being perfect.
+
+---
+
+# Autonomy
+
+Users remain in control.
+
+The app suggests.
+
+It never commands.
+
+Examples:
+
+Instead of:
+
+"Complete your workout now."
+
+Use:
+
+"Your trail is waiting whenever you're ready."
+
+The user always chooses.
+
+Choice strengthens commitment.
+
+---
+
+# Competence
+
+Users should regularly experience:
+
+"I can do this."
+
+Tasks should feel achievable.
+
+The app should celebrate effort long before mastery.
+
+Confidence grows from repeated success.
+
+---
+
+# Relatedness
+
+The strongest relationship inside Ascent is between:
+
+The user.
+
+The companion.
+
+The mountain.
+
+The app never tries to replace human relationships.
+
+Instead, it gently reminds users to nurture them.
+
+Examples:
+
+Calling family.
+
+Meeting friends.
+
+Helping someone.
+
+Real life remains the priority.
+
+---
+
+# Healthy Technology
+
+Ascent should encourage users to close the app.
+
+After planning today's expedition:
+
+The best experience happens outside the phone.
+
+The app exists to inspire action, not consume attention.
+
+---
+
+# Emotional Journey
+
+The emotional flow of every session should be:
+
+Arrival
+
+↓
+
+Calm
+
+↓
+
+Planning
+
+↓
+
+Motivation
+
+↓
+
+Real-world action
+
+↓
+
+Progress
+
+↓
+
+Reflection
+
+↓
+
+Peace
+
+---
+
+# The Feeling of Home
+
+Opening Ascent should feel like returning to a familiar mountain trail.
+
+A place that always welcomes you.
+
+No matter how long you've been away.
+
+---
+
+# What We Will Never Exploit
+
+Ascent will never intentionally use:
+
+* Fear of missing out
+* Endless notifications
+* Artificial urgency
+* Shame
+* Social comparison
+* Gambling mechanics
+* Manipulative streak systems
+* Dark patterns
+* Variable reward addiction loops designed to maximize screen time
+
+The user's well-being is always more important than engagement metrics.
+
+---
+
+# Definition of Success
+
+Ascent succeeds when users begin saying:
+
+"I enjoy improving myself."
+
+instead of
+
+"I have to improve myself."
+
+That shift in mindset is the true summit.
+
+---
+
+# Psychology Principles
+
+Every new feature must satisfy these questions:
+
+Does it reduce guilt?
+
+Does it build hope?
+
+Does it support autonomy?
+
+Does it make progress visible?
+
+Does it encourage real-world action?
+
+Does it strengthen identity instead of dependency?
+
+Would we be happy if the user spent less time in the app because they were living more fully?
+
+If the answer to any question is "No,"
+
+the feature does not belong in Ascent.

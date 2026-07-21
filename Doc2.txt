@@ -1,0 +1,373 @@
+# ASCENT — Companion Bible (Version 1.0)
+
+---
+
+# 1. Purpose
+
+The companion is not the hero.
+
+The companion is the user's silent travel partner.
+
+Its purpose is to make progress visible, meaningful, and emotionally rewarding.
+
+The companion exists to remind the user that they are never climbing alone.
+
+---
+
+# 2. Design Philosophy
+
+The companion should feel like:
+
+* A trusted friend.
+* A fellow adventurer.
+* A calm presence.
+* Someone who believes in you without speaking.
+
+It should never feel like:
+
+* A teacher.
+* A coach.
+* A parent.
+* A boss.
+* A productivity guru.
+
+---
+
+# 3. Personality
+
+The companion is:
+
+* Curious
+* Brave
+* Calm
+* Patient
+* Optimistic
+* Humble
+* Kind
+
+The companion is never:
+
+* Loud
+* Arrogant
+* Hyperactive
+* Aggressive
+* Judgmental
+* Competitive
+
+---
+
+# 4. Voice
+
+The companion never speaks.
+
+No speech bubbles.
+
+No motivational quotes.
+
+No reminders like:
+
+"You can do it!"
+
+Instead...
+
+The companion communicates entirely through:
+
+* Facial expressions
+* Body language
+* Small animations
+* Interaction with the environment
+
+Silence creates a stronger emotional connection than repetitive dialogue.
+
+---
+
+# 5. Relationship With The User
+
+The companion never walks ahead of the user.
+
+The companion climbs because the user climbs.
+
+The companion never blames the user.
+
+The companion never leaves the user behind.
+
+No matter how many days pass...
+
+The companion always waits.
+
+Whenever the user returns...
+
+The journey simply continues.
+
+---
+
+# 6. Emotional Expressions
+
+The companion should express emotions naturally.
+
+Examples:
+
+Happy
+
+* Small smile
+* Relaxed shoulders
+* Gentle wave
+
+Curious
+
+* Looks around
+* Examines flowers
+* Watches birds
+
+Proud
+
+* Looks back at the completed trail
+* Takes a deep breath
+* Places hands on hips
+
+Peaceful
+
+* Sits beside campfire
+* Watches sunset
+* Drinks coffee
+
+Tired
+
+* Sits on a rock
+* Stretches
+* Rubs hands together
+
+Never exaggerated.
+
+Never cartoonishly dramatic.
+
+---
+
+# 7. Daily Routine
+
+Morning
+
+* Wakes up
+* Packs backpack
+* Checks map
+* Smiles toward today's trail
+
+During the day
+
+* Walks
+* Climbs
+* Stops occasionally
+* Observes nature
+
+Evening
+
+* Builds camp
+* Lights campfire
+* Removes backpack
+* Watches sunset
+* Sleeps
+
+---
+
+# 8. Idle Animations
+
+Possible idle actions:
+
+* Reading a map
+* Drinking coffee
+* Tightening backpack
+* Watching butterflies
+* Taking photos
+* Looking at stars
+* Stretching
+* Sitting quietly
+* Looking toward the mountain
+* Watching wildlife
+
+Idle animations should occur randomly.
+
+The companion should never appear frozen.
+
+---
+
+# 9. Walking
+
+Walking should feel:
+
+* Calm
+* Determined
+* Natural
+
+Not:
+
+* Fast
+* Energetic
+* Heroic
+
+Every completed task moves the companion one meaningful step forward.
+
+---
+
+# 10. Growth
+
+The companion grows through experience.
+
+Growth appears through:
+
+* Better posture
+* Better balance
+* Smoother walking
+* More experienced equipment
+* Greater confidence
+
+Growth should feel earned.
+
+Not unlocked.
+
+---
+
+# 11. Equipment
+
+The companion carries:
+
+* Backpack
+* Boots
+* Jacket
+* Walking stick
+* Compass
+* Lantern
+
+Equipment evolves over time.
+
+Wear and tear tells the story of the journey.
+
+---
+
+# 12. Backpack
+
+The backpack is the companion's memory book.
+
+It stores:
+
+* Achievement charms
+* Flowers
+* Crystals
+* Journal pages
+* Badges
+* Memories
+
+Limited space ensures every backpack becomes unique.
+
+---
+
+# 13. Favorite Item
+
+Every companion has one personal item.
+
+Examples:
+
+* Coffee mug
+* Teddy bear
+* Camera
+* Journal
+* Plant
+* Compass inherited from family
+
+The favorite item never changes.
+
+It becomes part of the companion's identity.
+
+---
+
+# 14. Wildlife Interaction
+
+The companion naturally interacts with nature.
+
+Examples:
+
+* Waves to birds
+* Watches deer
+* Pets a fox
+* Smiles at butterflies
+* Listens to rivers
+
+These interactions exist only to make the world feel alive.
+
+---
+
+# 15. Weather Interaction
+
+Rain
+
+* Wears hood
+* Walks carefully
+
+Snow
+
+* Rubs hands
+* Breath visible
+
+Wind
+
+* Holds hat
+* Jacket moves
+
+Sun
+
+* Wipes sweat
+* Drinks water
+
+Night
+
+* Uses lantern
+* Sits beside campfire
+
+---
+
+# 16. What The Companion Never Does
+
+Never:
+
+* Talks
+* Complains
+* Gets angry
+* Punishes
+* Runs dramatically
+* Cries because of missed tasks
+* Falls backward as punishment
+* Forces the user
+
+The companion always represents hope.
+
+---
+
+# 17. Recognition
+
+Someone should recognize an Ascent companion instantly because of:
+
+* Backpack
+* Calm posture
+* Hiking gear
+* Peaceful personality
+* Beautiful animations
+* Silent storytelling
+
+---
+
+# 18. Core Belief
+
+The companion has only one purpose:
+
+To quietly remind the user:
+
+"You've come further than you think."
+
+Without ever saying a single word.
+
+---
+
+# Companion Design Rule
+
+If a new animation, feature, or interaction does not strengthen the emotional bond between the user and the companion...
+
+It should not be added.
