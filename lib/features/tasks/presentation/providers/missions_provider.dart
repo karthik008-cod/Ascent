@@ -27,23 +27,23 @@ class MissionNotifier extends StateNotifier<AsyncValue<List<Mission>>> {
     }
   }
 
-  /// Returns the new level if a level-up occurred, null otherwise.
-  Future<int?> toggleMissionStatus(Mission mission) async {
+  /// Returns the LevelUpEvent if a level-up occurred, null otherwise.
+  Future<LevelUpEvent?> toggleMissionStatus(Mission mission) async {
     final repository = ref.read(missionRepositoryProvider);
     mission.isCompleted = !mission.isCompleted;
     await repository.saveMission(mission);
     
-    int? newLevel;
+    LevelUpEvent? event;
     // XP Calculation & Notification Cancellation
     if (mission.isCompleted) {
-      newLevel = await ref.read(userStatsNotifierProvider.notifier).addXp(mission.xpReward);
+      event = await ref.read(userStatsNotifierProvider.notifier).addXp(mission.xpReward);
       await NotificationService.cancelNotification(mission.id);
     } else {
       await ref.read(userStatsNotifierProvider.notifier).removeXp(mission.xpReward);
     }
     
     await _loadMissions();
-    return newLevel;
+    return event;
   }
 
   Future<void> addMission(Mission mission) async {
@@ -102,6 +102,34 @@ final filteredSortedMissionsProvider = Provider<AsyncValue<List<Mission>>>((ref)
       if (filter == 'Main') return m.type == MissionType.main;
       if (filter == 'Side') return m.type == MissionType.side;
       if (filter == 'Routine') return m.type == MissionType.routine;
+      if (filter == 'Daily') return m.description?.contains('Repeats: Daily') ?? false;
+      if (filter.startsWith('Weekly')) {
+        if (m.description == null) return false;
+        if (!m.description!.contains('Repeats: Weekly') && !m.description!.contains('Repeats: Custom Days')) {
+          return false;
+        }
+        if (filter.contains(':')) {
+          final dayStr = filter.split(':')[1];
+          final dayIndex = int.tryParse(dayStr);
+          if (dayIndex != null) {
+            final daysMatch = RegExp(r'Days:\s*([0-9,\s]+)').firstMatch(m.description!);
+            if (daysMatch != null && daysMatch.group(1) != null) {
+              final days = daysMatch.group(1)!.split(',').map((s) => int.tryParse(s.trim())).whereType<int>().toSet();
+              return days.contains(dayIndex);
+            } else {
+               return m.date.weekday == dayIndex;
+            }
+          }
+        }
+        return true;
+      }
+      if (filter == 'Once') {
+        return m.description == null || 
+               m.description!.contains('Repeats: Never') || 
+               (!m.description!.contains('Repeats: Daily') && 
+                !m.description!.contains('Repeats: Weekly') && 
+                !m.description!.contains('Repeats: Custom Days'));
+      }
       if (filter.startsWith('#')) {
         return m.description?.contains(filter) ?? false;
       }

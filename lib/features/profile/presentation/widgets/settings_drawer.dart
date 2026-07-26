@@ -7,6 +7,7 @@ import '../../../tasks/presentation/providers/missions_provider.dart';
 import '../../../progress/presentation/providers/user_stats_provider.dart';
 import '../../../tasks/presentation/providers/data_providers.dart';
 import '../../../journey/presentation/screens/onboarding_screen.dart';
+import '../../../../core/widgets/dynamic_loading_indicator.dart';
 
 class SettingsDrawer {
   static void show(BuildContext context, WidgetRef ref) {
@@ -233,6 +234,21 @@ class SettingsDrawer {
                       ),
                       const SizedBox(height: 8),
 
+                      // Switch Account
+                      _buildDrawerItem(
+                        context: ctx,
+                        icon: Icons.switch_account_rounded,
+                        label: 'Switch Account',
+                        subtitle: 'Log into a different account',
+                        color: AppColors.secondary,
+                        isDark: isCurrentlyDark,
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _showSwitchAccountSheet(context, ref);
+                        },
+                      ),
+                      const SizedBox(height: 8),
+
                       // Sign Out
                       _buildDrawerItem(
                         context: ctx,
@@ -247,6 +263,219 @@ class SettingsDrawer {
                         },
                       ),
                       const SizedBox(height: 8),
+
+                      // Delete Account
+                      _buildDrawerItem(
+                        context: ctx,
+                        icon: Icons.person_remove_rounded,
+                        label: 'Delete Account',
+                        subtitle: 'Permanently remove your data',
+                        color: AppColors.error,
+                        isDark: isCurrentlyDark,
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _showDeleteAccountConfirmation(context, ref, isCurrentlyDark);
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  static void _showDeleteAccountConfirmation(BuildContext context, WidgetRef ref, bool isDark) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black87,
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            bool isDeleting = false;
+            
+            return ScaleTransition(
+              scale: Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(
+                parent: animation, curve: Curves.easeOutBack,
+              )),
+              child: FadeTransition(
+                opacity: animation,
+                child: AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                  backgroundColor: isDark ? AppColors.surface : AppColors.lightSurface,
+                  contentPadding: const EdgeInsets.all(32),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Warning icon
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: AppColors.error.withOpacity(0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.delete_forever_rounded, color: AppColors.error, size: 48),
+                      ),
+                      const SizedBox(height: 24),
+                      Text('Delete Account?', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary)),
+                      const SizedBox(height: 16),
+                      if (isDeleting)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 32.0),
+                          child: DynamicLoadingIndicator(
+                            messages: ['Connecting to server...', 'Erasing cloud data...', 'Wiping local storage...', 'Signing out...'],
+                            color: AppColors.error,
+                          ),
+                        )
+                      else ...[
+                        Text(
+                          'This action is permanent and cannot be undone.\n\n'
+                          'All your missions, XP, streaks, badges, and projects will be permanently deleted from both your device and our servers.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            height: 1.5,
+                            fontSize: 14,
+                            color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.pop(context),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  side: BorderSide(color: isDark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                ),
+                                child: Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary)),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  setState(() => isDeleting = true);
+                                  await ref.read(authNotifierProvider.notifier).deleteAccount();
+                                  if (context.mounted) Navigator.pop(context); // pop dialog
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.error,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                ),
+                                child: const Text('Delete', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  static void _showSwitchAccountSheet(BuildContext context, WidgetRef ref) async {
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    final savedUsers = await authNotifier.getSavedUsers();
+
+    if (!context.mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Consumer(
+          builder: (ctx, ref, _) {
+            final isDark = ref.watch(themeNotifierProvider) == ThemeMode.dark;
+            final currentUser = ref.watch(authNotifierProvider).valueOrNull;
+            return Container(
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.surface : AppColors.lightSurface,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 4,
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: isDark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      Text('Switch Account', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary)),
+                      const SizedBox(height: 16),
+                      if (savedUsers.isEmpty)
+                        Text('No other accounts saved.', style: TextStyle(color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary))
+                      else
+                        ...savedUsers.map((user) {
+                          final isCurrent = currentUser?.email == user.email;
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: AppColors.primary.withOpacity(0.15),
+                              child: Text(user.name.isNotEmpty ? user.name.substring(0, 1).toUpperCase() : 'U', style: const TextStyle(color: AppColors.primary)),
+                            ),
+                            title: Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    user.name, 
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (isCurrent) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text('Current account', style: TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            subtitle: Text(user.email, style: TextStyle(color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary)),
+                            onTap: isCurrent ? null : () {
+                              Navigator.pop(ctx);
+                              authNotifier.switchAccount(user);
+                            },
+                          );
+                        }),
+                      const SizedBox(height: 16),
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: AppColors.secondary.withOpacity(0.15),
+                          child: const Icon(Icons.add_rounded, color: AppColors.secondary),
+                        ),
+                        title: Text('Add an account', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary)),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          authNotifier.signOut();
+                        },
+                      ),
                     ],
                   ),
                 ),

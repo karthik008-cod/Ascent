@@ -71,7 +71,7 @@ class AppTheme {
           fontWeight: FontWeight.w500,
           fontSize: 13,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: AppColors.surfaceHighlight.withOpacity(0.5), width: 1),

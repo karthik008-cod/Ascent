@@ -16,17 +16,18 @@ class MainScaffold extends ConsumerWidget {
     return _ReminderWrapper(
       child: Scaffold(
         body: navigationShell,
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: navigationShell.currentIndex,
-          onTap: (int idx) => navigationShell.goBranch(
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+          onDestinationSelected: (int idx) => navigationShell.goBranch(
             idx,
             initialLocation: idx == navigationShell.currentIndex,
           ),
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Today'),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_view_week_rounded), label: 'Planner'),
-            BottomNavigationBarItem(icon: Icon(Icons.show_chart_rounded), label: 'Progress'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profile'),
+          destinations: const [
+            NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Today'),
+            NavigationDestination(icon: Icon(Icons.calendar_view_week_rounded), label: 'Planner'),
+            NavigationDestination(icon: Icon(Icons.show_chart_rounded), label: 'Progress'),
+            NavigationDestination(icon: Icon(Icons.person_rounded), label: 'Profile'),
           ],
         ),
       ),
@@ -50,6 +51,7 @@ class AnimatedTabContainer extends StatefulWidget {
 
 class _AnimatedTabContainerState extends State<AnimatedTabContainer> {
   late PageController _pageController;
+  bool _isAnimatingProgrammatically = false;
 
   @override
   void initState() {
@@ -65,6 +67,7 @@ class _AnimatedTabContainerState extends State<AnimatedTabContainer> {
     
     if (newIndex != oldIndex) {
       if (_pageController.hasClients && _pageController.page?.round() != newIndex) {
+        _isAnimatingProgrammatically = true;
         if ((newIndex - oldIndex).abs() > 1) {
           final jumpIndex = newIndex > oldIndex ? newIndex - 1 : newIndex + 1;
           _pageController.jumpToPage(jumpIndex);
@@ -73,7 +76,9 @@ class _AnimatedTabContainerState extends State<AnimatedTabContainer> {
           newIndex,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutCubic,
-        );
+        ).then((_) {
+          _isAnimatingProgrammatically = false;
+        });
       }
     }
   }
@@ -90,6 +95,7 @@ class _AnimatedTabContainerState extends State<AnimatedTabContainer> {
       controller: _pageController,
       physics: const PageScrollPhysics(parent: BouncingScrollPhysics()),
       onPageChanged: (index) {
+        if (_isAnimatingProgrammatically) return;
         if (index != widget.navigationShell.currentIndex) {
           widget.navigationShell.goBranch(
             index,

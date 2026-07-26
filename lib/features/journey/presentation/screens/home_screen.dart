@@ -5,7 +5,8 @@ import '../../../tasks/presentation/providers/missions_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../tasks/data/models/mission.dart';
-import '../../../tasks/presentation/widgets/add_mission_sheet.dart';
+import 'package:go_router/go_router.dart';
+import '../../../tasks/presentation/screens/add_mission_screen.dart';
 import '../../../tasks/presentation/widgets/filter_sort_bar.dart';
 import '../../../profile/presentation/widgets/settings_drawer.dart';
 import '../../../progress/presentation/widgets/level_up_celebration.dart';
@@ -218,12 +219,7 @@ class HomeScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => const AddMissionSheet(),
-          );
+          context.push('/add-task');
         },
         backgroundColor: AppColors.primary,
         tooltip: 'Assign Mission Priority',
@@ -286,12 +282,7 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildMainGoalCard(BuildContext context, WidgetRef ref, Mission mission) {
     return GestureDetector(
       onTap: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (context) => AddMissionSheet(existingMission: mission),
-        );
+        context.push('/add-task', extra: mission);
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
@@ -330,9 +321,9 @@ class HomeScreen extends ConsumerWidget {
                     const SizedBox(width: 12),
                     GestureDetector(
                       onTap: () async {
-                        final newLevel = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
-                        if (newLevel != null && context.mounted) {
-                          showLevelUpCelebration(context, newLevel);
+                        final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                        if (event != null && context.mounted) {
+                          showLevelUpCelebration(context, event.oldLevel, event.newLevel);
                         }
                       },
                       child: mission.isCompleted
@@ -365,19 +356,15 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildSideGoalCard(BuildContext context, WidgetRef ref, Mission mission) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (context) => AddMissionSheet(existingMission: mission),
-        );
+        context.push('/add-task', extra: mission);
       },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: isDark ? AppColors.surface : AppColors.lightSurface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: mission.isCompleted ? AppColors.success.withOpacity(0.4) : AppColors.primary.withOpacity(0.35), width: 1.2),
         ),
@@ -385,9 +372,9 @@ class HomeScreen extends ConsumerWidget {
           children: [
             GestureDetector(
               onTap: () async {
-                final newLevel = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
-                if (newLevel != null && context.mounted) {
-                  showLevelUpCelebration(context, newLevel);
+                final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                if (event != null && context.mounted) {
+                  showLevelUpCelebration(context, event.oldLevel, event.newLevel);
                 }
               },
               child: Icon(
@@ -405,7 +392,7 @@ class HomeScreen extends ConsumerWidget {
                     mission.title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       decoration: mission.isCompleted ? TextDecoration.lineThrough : null,
-                      color: mission.isCompleted ? AppColors.textSecondary : AppColors.textPrimary,
+                      color: mission.isCompleted ? (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary) : (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -439,20 +426,16 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildRoutineTile(BuildContext context, WidgetRef ref, Mission mission) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       child: Material(
-        color: AppColors.surface.withOpacity(0.7),
+        color: (isDark ? AppColors.surface : AppColors.lightSurface).withOpacity(0.7),
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (context) => AddMissionSheet(existingMission: mission),
-            );
+            context.push('/add-task', extra: mission);
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -460,9 +443,9 @@ class HomeScreen extends ConsumerWidget {
               children: [
                 GestureDetector(
                   onTap: () async {
-                    final newLevel = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
-                    if (newLevel != null && context.mounted) {
-                      showLevelUpCelebration(context, newLevel);
+                    final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                    if (event != null && context.mounted) {
+                      showLevelUpCelebration(context, event.oldLevel, event.newLevel);
                     }
                   },
                   child: Icon(
@@ -477,7 +460,7 @@ class HomeScreen extends ConsumerWidget {
                     mission.title,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       decoration: mission.isCompleted ? TextDecoration.lineThrough : null,
-                      color: mission.isCompleted ? AppColors.textSecondary : AppColors.textPrimary,
+                      color: mission.isCompleted ? (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary) : (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -497,9 +480,9 @@ class HomeScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.surface.withOpacity(0.4),
+        color: (Theme.of(context).brightness == Brightness.dark ? AppColors.surface : AppColors.lightSurface).withOpacity(0.4),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.surfaceHighlight.withOpacity(0.4), style: BorderStyle.solid),
+        border: Border.all(color: (Theme.of(context).brightness == Brightness.dark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight).withOpacity(0.4), style: BorderStyle.solid),
       ),
       child: Center(
         child: Text(

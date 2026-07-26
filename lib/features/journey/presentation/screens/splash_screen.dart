@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../presentation/screens/dart:async';
+import 'dart:async';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../core/router/app_router.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -36,6 +37,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void _navigate() {
     if (!mounted) return;
     
+    // Set splash as shown so redirect allows navigation away from /splash
+    ref.read(splashNotifierProvider.notifier).state = true;
+    
     // Triggering navigation to root will run redirect logic
     context.go('/');
   }
@@ -61,23 +65,34 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final logoWidth = constraints.maxWidth * 0.60;
-                    return Container(
-                      width: logoWidth,
-                      height: logoWidth,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Theme.of(context).primaryColor.withOpacity(0.15),
-                            blurRadius: 40,
-                            spreadRadius: 10,
+                    return AnimatedOpacity(
+                      opacity: _showMotto ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 1000),
+                      curve: Curves.easeOut,
+                      child: AnimatedScale(
+                        scale: _showMotto ? 1.0 : 0.8,
+                        duration: const Duration(milliseconds: 1000),
+                        curve: Curves.easeOutBack,
+                        child: Container(
+                          width: logoWidth,
+                          height: logoWidth,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(32),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(context).primaryColor.withOpacity(0.20),
+                                blurRadius: 40,
+                                spreadRadius: 16,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          fit: BoxFit.cover,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(32),
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ),
                     );
@@ -96,10 +111,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     child: Text(
                       motto,
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.8,
+                        color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.8),
                       ),
                     ),
                   ),

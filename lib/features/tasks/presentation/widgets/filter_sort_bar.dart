@@ -26,12 +26,12 @@ class FilterSortBar extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: currentFilter != 'All'
                       ? AppColors.primary.withValues(alpha: 0.15)
-                      : AppColors.surfaceHighlight.withValues(alpha: 0.35),
+                      : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: currentFilter != 'All'
                         ? AppColors.primary
-                        : AppColors.surfaceHighlight,
+                        : Theme.of(context).colorScheme.surfaceContainerHighest,
                   ),
                 ),
                 child: Row(
@@ -42,7 +42,7 @@ class FilterSortBar extends ConsumerWidget {
                       size: 18,
                       color: currentFilter != 'All'
                           ? AppColors.primary
-                          : AppColors.textSecondary,
+                          : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                     ),
                     const SizedBox(width: 8),
                     Flexible(
@@ -53,7 +53,7 @@ class FilterSortBar extends ConsumerWidget {
                           fontWeight: FontWeight.w600,
                           color: currentFilter != 'All'
                               ? AppColors.primary
-                              : AppColors.textPrimary,
+                              : Theme.of(context).colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -73,12 +73,12 @@ class FilterSortBar extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: currentSort != 'Default'
                       ? AppColors.secondary.withValues(alpha: 0.15)
-                      : AppColors.surfaceHighlight.withValues(alpha: 0.35),
+                      : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: currentSort != 'Default'
                         ? AppColors.secondary
-                        : AppColors.surfaceHighlight,
+                        : Theme.of(context).colorScheme.surfaceContainerHighest,
                   ),
                 ),
                 child: Row(
@@ -89,7 +89,7 @@ class FilterSortBar extends ConsumerWidget {
                       size: 18,
                       color: currentSort != 'Default'
                           ? AppColors.secondary
-                          : AppColors.textSecondary,
+                          : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                     ),
                     const SizedBox(width: 8),
                     Flexible(
@@ -100,7 +100,7 @@ class FilterSortBar extends ConsumerWidget {
                           fontWeight: FontWeight.w600,
                           color: currentSort != 'Default'
                               ? AppColors.secondary
-                              : AppColors.textPrimary,
+                              : Theme.of(context).colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -119,17 +119,27 @@ class FilterSortBar extends ConsumerWidget {
     HapticFeedback.lightImpact();
     SystemSound.play(SystemSoundType.click);
 
+    String? expandedWeeklyDay;
+    String baseFilterType = currentFilter;
+    if (currentFilter.startsWith('Weekly:')) {
+      baseFilterType = 'Weekly';
+      expandedWeeklyDay = currentFilter.split(':')[1];
+    }
+    bool isWeeklyExpanded = baseFilterType == 'Weekly';
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       isScrollControlled: true,
       builder: (context) {
-        return Consumer(
-          builder: (context, ref, child) {
-            final availableHashtags = ref.watch(availableHashtagsProvider);
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Consumer(
+              builder: (context, ref, child) {
+                final availableHashtags = ref.watch(availableHashtagsProvider);
 
             return SafeArea(
               child: Padding(
@@ -145,7 +155,7 @@ class FilterSortBar extends ConsumerWidget {
                           width: 40,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceHighlight,
+                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -154,12 +164,12 @@ class FilterSortBar extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Filter Missions',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           if (currentFilter != 'All')
@@ -168,7 +178,7 @@ class FilterSortBar extends ConsumerWidget {
                                 ref.read(missionFilterProvider.notifier).state = 'All';
                                 Navigator.pop(context);
                               },
-                              child: const Text(
+                              child: Text(
                                 'Reset (All)',
                                 style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                               ),
@@ -180,7 +190,7 @@ class FilterSortBar extends ConsumerWidget {
                         'BY MISSION TYPE',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               letterSpacing: 1.5,
-                              color: AppColors.textSecondary,
+                              color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                             ),
                       ),
                       const SizedBox(height: 10),
@@ -197,10 +207,10 @@ class FilterSortBar extends ConsumerWidget {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                               decoration: BoxDecoration(
-                                color: isSelected ? AppColors.primary : AppColors.background,
+                                color: isSelected ? AppColors.primary : Theme.of(context).scaffoldBackgroundColor,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: isSelected ? AppColors.primary : AppColors.surfaceHighlight,
+                                  color: isSelected ? AppColors.primary : Theme.of(context).colorScheme.surfaceContainerHighest,
                                 ),
                               ),
                               child: Text(
@@ -208,7 +218,7 @@ class FilterSortBar extends ConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                                  color: isSelected ? Colors.white : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                                 ),
                               ),
                             ),
@@ -217,17 +227,124 @@ class FilterSortBar extends ConsumerWidget {
                       ),
                       const SizedBox(height: 20),
                       Text(
+                        'BY REPETITION',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              letterSpacing: 1.5,
+                              color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
+                            ),
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: ['Daily', 'Weekly', 'Once'].map((type) {
+                          final isSelected = baseFilterType == type;
+                          return GestureDetector(
+                            onTap: () {
+                              if (type == 'Weekly') {
+                                setState(() {
+                                  isWeeklyExpanded = true;
+                                  baseFilterType = 'Weekly';
+                                });
+                              } else {
+                                ref.read(missionFilterProvider.notifier).state = type;
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: isSelected ? AppColors.primary : Theme.of(context).scaffoldBackgroundColor,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isSelected ? AppColors.primary : Theme.of(context).colorScheme.surfaceContainerHighest,
+                                ),
+                              ),
+                              child: Text(
+                                type,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                  color: isSelected ? Colors.white : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        child: !isWeeklyExpanded ? const SizedBox(width: double.infinity) : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16),
+                            Text(
+                              'SELECT DAY OF THE WEEK',
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    letterSpacing: 1.5,
+                                    color: AppColors.primary,
+                                  ),
+                            ),
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                {'label': 'Mon', 'val': '1'},
+                                {'label': 'Tue', 'val': '2'},
+                                {'label': 'Wed', 'val': '3'},
+                                {'label': 'Thu', 'val': '4'},
+                                {'label': 'Fri', 'val': '5'},
+                                {'label': 'Sat', 'val': '6'},
+                                {'label': 'Sun', 'val': '7'},
+                              ].map((dayObj) {
+                                final isSelectedDay = expandedWeeklyDay == dayObj['val'];
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      expandedWeeklyDay = dayObj['val'];
+                                    });
+                                    ref.read(missionFilterProvider.notifier).state = 'Weekly:${dayObj['val']}';
+                                    Navigator.pop(context);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: isSelectedDay ? AppColors.primary : Theme.of(context).scaffoldBackgroundColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isSelectedDay ? AppColors.primary : Theme.of(context).colorScheme.surfaceContainerHighest,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      dayObj['label']!,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: isSelectedDay ? FontWeight.bold : FontWeight.w500,
+                                        color: isSelectedDay ? Colors.white : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
                         'BY HASHTAG',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               letterSpacing: 1.5,
-                              color: AppColors.textSecondary,
+                              color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                             ),
                       ),
                       const SizedBox(height: 10),
                       if (availableHashtags.isEmpty)
-                        const Text(
+                        Text(
                           'No hashtags found in your missions yet.',
-                          style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                          style: TextStyle(fontSize: 13, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                         )
                       else
                         Wrap(
@@ -243,10 +360,10 @@ class FilterSortBar extends ConsumerWidget {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? AppColors.primary.withValues(alpha: 0.2) : AppColors.background,
+                                  color: isSelected ? AppColors.primary.withValues(alpha: 0.2) : Theme.of(context).scaffoldBackgroundColor,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: isSelected ? AppColors.primary : AppColors.surfaceHighlight,
+                                    color: isSelected ? AppColors.primary : Theme.of(context).colorScheme.surfaceContainerHighest,
                                   ),
                                 ),
                                 child: Row(
@@ -257,12 +374,12 @@ class FilterSortBar extends ConsumerWidget {
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                        color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                                        color: isSelected ? AppColors.primary : Theme.of(context).colorScheme.onSurface,
                                       ),
                                     ),
                                     if (isSelected) ...[
                                       const SizedBox(width: 6),
-                                      const Icon(Icons.check_rounded, size: 14, color: AppColors.primary),
+                                      Icon(Icons.check_rounded, size: 14, color: AppColors.primary),
                                     ],
                                   ],
                                 ),
@@ -279,7 +396,9 @@ class FilterSortBar extends ConsumerWidget {
         );
       },
     );
-  }
+  },
+);
+}
 
   void _showSortPopup(BuildContext context, WidgetRef ref, String currentSort) {
     HapticFeedback.lightImpact();
@@ -295,7 +414,7 @@ class FilterSortBar extends ConsumerWidget {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -314,18 +433,18 @@ class FilterSortBar extends ConsumerWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceHighlight,
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Sort Missions',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -344,17 +463,17 @@ class FilterSortBar extends ConsumerWidget {
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: isSelected ? AppColors.secondary.withValues(alpha: 0.15) : AppColors.background,
+                          color: isSelected ? AppColors.secondary.withValues(alpha: 0.15) : Theme.of(context).scaffoldBackgroundColor,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: isSelected ? AppColors.secondary : AppColors.surfaceHighlight,
+                            color: isSelected ? AppColors.secondary : Theme.of(context).colorScheme.surfaceContainerHighest,
                           ),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               icon,
-                              color: isSelected ? AppColors.secondary : AppColors.textSecondary,
+                              color: isSelected ? AppColors.secondary : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                               size: 22,
                             ),
                             const SizedBox(width: 14),
@@ -367,22 +486,22 @@ class FilterSortBar extends ConsumerWidget {
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                                      color: isSelected ? AppColors.secondary : AppColors.textPrimary,
+                                      color: isSelected ? AppColors.secondary : Theme.of(context).colorScheme.onSurface,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     desc,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      color: AppColors.textSecondary,
+                                      color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                             if (isSelected)
-                              const Icon(Icons.check_circle_rounded, color: AppColors.secondary, size: 20),
+                              Icon(Icons.check_circle_rounded, color: AppColors.secondary, size: 20),
                           ],
                         ),
                       ),

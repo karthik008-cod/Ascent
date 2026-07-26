@@ -4,9 +4,12 @@ import './core/theme/theme.dart';
 import './core/router/app_router.dart';
 import './core/services/notification_service.dart';
 import './features/profile/presentation/providers/theme_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import './core/services/sync_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await NotificationService.init();
   runApp(const ProviderScope(child: AscentApp()));
 }
@@ -18,6 +21,7 @@ class AscentApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeNotifierProvider);
+    ref.watch(syncServiceProvider);
 
     return MaterialApp.router(
       title: 'Ascent',

@@ -114,39 +114,62 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> with SingleTick
                   ),
 
                   // Animated Level Circle
-                  Center(
-                    child: AnimatedBuilder(
-                      animation: _pulseAnimation,
-                      builder: (context, child) {
-                        return Container(
-                          width: 150,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: AppColors.primaryGradient,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primary.withOpacity(0.3 * _pulseAnimation.value),
-                                blurRadius: 24 + (12 * _pulseAnimation.value),
-                                spreadRadius: 4 + (4 * _pulseAnimation.value),
-                              )
-                            ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (stats.currentLevel > 1) ...[
+                        Text(
+                          '${stats.currentLevel - 1}',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
                           ),
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text('LVL', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, letterSpacing: 2)),
-                                Text(
-                                  '${stats.currentLevel}',
-                                  style: Theme.of(context).textTheme.displayLarge?.copyWith(color: Colors.white, fontSize: 52),
-                                ),
+                        ),
+                        const SizedBox(width: 24),
+                      ] else const SizedBox(width: 40),
+                      AnimatedBuilder(
+                        animation: _pulseAnimation,
+                        builder: (context, child) {
+                          return Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: AppColors.primaryGradient,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.3 * _pulseAnimation.value),
+                                  blurRadius: 24 + (12 * _pulseAnimation.value),
+                                  spreadRadius: 4 + (4 * _pulseAnimation.value),
+                                )
                               ],
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text('LVL', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                                  Text(
+                                    '${stats.currentLevel}',
+                                    style: Theme.of(context).textTheme.displayLarge?.copyWith(color: Colors.white, fontSize: 52),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 24),
+                      Text(
+                        '${stats.currentLevel + 1}',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 28),
 

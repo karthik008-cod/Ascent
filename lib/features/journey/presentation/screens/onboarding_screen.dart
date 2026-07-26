@@ -65,6 +65,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           'Make it reflect who you are and who you want to become.',
       ],
     ),
+    _OnboardingPageData(
+      isLogo: true,
+      gradientColors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+      title: 'Settings & Menu',
+      subtitle: 'Customize Your Experience',
+      points: [
+          'Access the settings drawer by tapping your profile icon.',
+          'Toggle seamlessly between Light and Dark mode.',
+          'Backup your data to the cloud, read the manual, or manage your account.',
+      ],
+    ),
   ];
 
   void _onPageChanged(int page) {
@@ -243,7 +254,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ),
               ],
             ),
-            child: Icon(data.icon, size: 64, color: Colors.white),
+            child: data.isLogo 
+                ? ClipOval(child: Image.asset('assets/images/logo.png', fit: BoxFit.cover))
+                : Icon(data.icon, size: 64, color: Colors.white),
           ),
           const SizedBox(height: 40),
           // Title
@@ -297,14 +310,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 }
 
 class _OnboardingPageData {
-  final IconData icon;
+  final IconData? icon;
+  final bool isLogo;
   final List<Color> gradientColors;
   final String title;
   final String subtitle;
   final List<String> points;
 
   const _OnboardingPageData({
-    required this.icon,
+    this.icon,
+    this.isLogo = false,
     required this.gradientColors,
     required this.title,
     required this.subtitle,

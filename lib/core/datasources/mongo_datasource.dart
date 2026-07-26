@@ -1,123 +1,130 @@
-import 'package:mongo_dart/mongo_dart.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../features/tasks/data/models/mission.dart';
+import '../../features/tasks/data/models/project.dart';
 import '../../features/progress/data/models/user_stats.dart';
 
 class MongoDataSource {
-  static const String _connectionString = 'mongodb://yuvaankaarthikeyaa1206_db_user:aykMDB_1206@ac-gfrmfwn-shard-00-00.3f9wxcf.mongodb.net:27017,ac-gfrmfwn-shard-00-01.3f9wxcf.mongodb.net:27017,ac-gfrmfwn-shard-00-02.3f9wxcf.mongodb.net:27017/ascent_db?authSource=admin&replicaSet=atlas-co8mro-shard-0&tls=true';
-  Db? _db;
+  static String get _baseUrl => dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:3000/api';
 
-  Future<void> connect() async {
-    if (_db != null && _db!.state == State.OPEN) return;
-    _db = await Db.create(_connectionString);
-    await _db!.open();
-  }
+  Future<void> connect() async {}
+  Future<void> disconnect() async {}
 
-  Future<void> disconnect() async {
-    if (_db != null && _db!.state == State.OPEN) {
-      await _db!.close();
-    }
-  }
-
-  // --- Auth ---
   Future<bool> checkUserExists(String email) async {
-    await connect();
-    final usersCollection = _db!.collection('users');
-    final existingUser = await usersCollection.findOne({'email': email});
-    return existingUser != null;
+    final response = await http.post(
+      Uri.parse('$_baseUrl/auth/check'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['exists'] == true;
+    }
+    return false;
   }
 
   Future<Map<String, dynamic>?> signUp(String email, String password, String name) async {
-    await connect();
-    final usersCollection = _db!.collection('users');
-    
-    final existingUser = await usersCollection.findOne({'email': email});
-    if (existingUser != null) {
-      throw Exception('User already exists');
+    final response = await http.post(
+      Uri.parse('$_baseUrl/auth/signup'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password, 'name': name}),
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
     }
-
-    final userId = ObjectId().toHexString();
-    final newUser = {
-      '_id': userId,
-      'email': email,
-      'password': password, // In production, this should be hashed.
-      'name': name,
-      'createdAt': DateTime.now().toIso8601String(),
-    };
-
-    await usersCollection.insert(newUser);
-    return newUser;
+    throw Exception('Failed to sign up: ${response.body}');
   }
 
   Future<Map<String, dynamic>?> signIn(String email, String password) async {
-    await connect();
-    final usersCollection = _db!.collection('users');
-    
-    final user = await usersCollection.findOne({'email': email, 'password': password});
-    if (user == null) {
-      throw Exception('Invalid email or password');
-    }
-    
-    // Ensure _id is treated as a string for SharedPreferences
-    final Map<String, dynamic> normalizedUser = Map<String, dynamic>.from(user);
-    if (normalizedUser['_id'] is ObjectId) {
-       normalizedUser['_id'] = (normalizedUser['_id'] as ObjectId).toHexString();
-    }
-    return normalizedUser;
-  }
-  
-  Future<Map<String, dynamic>?> signInWithEmailOnly(String email) async {
-    await connect();
-    final usersCollection = _db!.collection('users');
-    
-    final user = await usersCollection.findOne({'email': email});
-    if (user == null) {
-      throw Exception('User not found');
-    }
-    
-    final Map<String, dynamic> normalizedUser = Map<String, dynamic>.from(user);
-    if (normalizedUser['_id'] is ObjectId) {
-       normalizedUser['_id'] = (normalizedUser['_id'] as ObjectId).toHexString();
-    }
-    return normalizedUser;
-  }
-  
-  // --- Backup (Sync) ---
-  Future<void> backupData(String userId, List<Mission> missions, UserStats stats) async {
-    await connect();
-    
-    // Backup Stats
-    final statsCollection = _db!.collection('user_stats');
-    await statsCollection.update(
-      where.eq('userId', userId),
-      {
-        'userId': userId,
-        'totalXp': stats.totalXp,
-        'currentLevel': stats.currentLevel,
-        'currentStreak': stats.currentStreak,
-        'longestStreak': stats.longestStreak,
-        'lastActiveDate': stats.lastActiveDate?.toIso8601String(),
-        'updatedAt': DateTime.now().toIso8601String(),
-      },
-      upsert: true,
+    final response = await http.post(
+      Uri.parse('$_baseUrl/auth/signin'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
     );
-    
-    // Backup Missions
-    final missionsCollection = _db!.collection('missions');
-    for (var m in missions) {
-      await missionsCollection.update(
-        where.eq('id', m.id).and(where.eq('userId', userId)),
-        {
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Invalid email or password');
+  }
+
+  Future<Map<String, dynamic>?> signInWithEmailOnly(String email) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/auth/signin-email'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('User not found');
+  }
+
+  Future<void> updatePassword(String email, String newPassword) async {
+    final response = await http.put(
+      Uri.parse('$_baseUrl/auth/password'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'newPassword': newPassword}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update password');
+    }
+  }
+
+  Future<void> deleteUser(String email) async {
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/auth/$email'),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete user');
+    }
+  }
+
+  Future<void> backupData(String userId, List<Mission> missions, UserStats stats, [List<Project>? projects]) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/sync/backup'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'userId': userId,
+        'stats': {
+          'totalXp': stats.totalXp,
+          'currentLevel': stats.currentLevel,
+          'currentStreak': stats.currentStreak,
+          'longestStreak': stats.longestStreak,
+          'lastActiveDate': stats.lastActiveDate?.toIso8601String(),
+        },
+        'missions': missions.map((m) => {
           'id': m.id,
-          'userId': userId,
           'title': m.title,
           'description': m.description,
           'type': m.type.index,
           'xpReward': m.xpReward,
           'isCompleted': m.isCompleted,
           'date': m.date.toIso8601String(),
-        },
-        upsert: true,
-      );
+          'projectId': m.projectId,
+        }).toList(),
+        'projects': projects?.map((p) => {
+          'id': p.id,
+          'title': p.title,
+          'description': p.description,
+          'notes': p.notes,
+          'progress': p.progress,
+          'createdAt': p.createdAt.toIso8601String(),
+        }).toList(),
+      }),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Backup failed: ${response.body}');
     }
+  }
+
+  Future<Map<String, dynamic>> restoreData(String userId) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/sync/restore/$userId'),
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Restore failed');
   }
 }

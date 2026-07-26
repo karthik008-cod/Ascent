@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import '../providers/missions_provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../data/models/mission.dart';
-import '../widgets/add_mission_sheet.dart';
+import 'package:go_router/go_router.dart';
+import '../screens/add_mission_screen.dart';
 import '../widgets/filter_sort_bar.dart';
 import '../../../profile/presentation/widgets/settings_drawer.dart';
 import '../../../progress/presentation/widgets/level_up_celebration.dart';
@@ -109,12 +110,7 @@ class PlannerScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => const AddMissionSheet(),
-          );
+          context.push('/add-task');
         },
         backgroundColor: AppColors.secondary,
         tooltip: 'Add Mission / Task',
@@ -134,12 +130,7 @@ class PlannerScreen extends ConsumerWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (context) => AddMissionSheet(existingMission: mission),
-            );
+            context.push('/add-task', extra: mission);
           },
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -147,9 +138,9 @@ class PlannerScreen extends ConsumerWidget {
               children: [
                 GestureDetector(
                   onTap: () async {
-                    final newLevel = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
-                    if (newLevel != null && context.mounted) {
-                      showLevelUpCelebration(context, newLevel);
+                    final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+                    if (event != null && context.mounted) {
+                      showLevelUpCelebration(context, event.oldLevel, event.newLevel);
                     }
                   },
                   child: Icon(

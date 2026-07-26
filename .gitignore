@@ -13,6 +13,7 @@
 run_app.bat
 backend/node_modules
 backend/.env
+.env
 .swiftpm/
 migrate_working_dir/
 

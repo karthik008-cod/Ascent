@@ -62,6 +62,11 @@ class LocalIsarDataSource {
   }
 
   // Missions
+  Future<List<Mission>> getAllMissions() async {
+    final isar = await db;
+    return await isar.missions.where().findAll();
+  }
+
   Future<List<Mission>> getMissionsForDate(DateTime date) async {
     final isar = await db;
     final startOfDay = DateTime(date.year, date.month, date.day);
@@ -103,6 +108,43 @@ class LocalIsarDataSource {
     final isar = await db;
     await isar.writeTxn(() async {
       await isar.projects.delete(id);
+    });
+  }
+
+  // --- Wipe & Restore helpers ---
+  
+  /// Clears all local data (missions, stats, projects). Used on account switch/delete.
+  Future<void> clearAllData() async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      await isar.missions.clear();
+      await isar.userStats.clear();
+      await isar.projects.clear();
+      await isar.taskItems.clear();
+    });
+  }
+
+  /// Bulk import missions from MongoDB restore.
+  Future<void> importMissions(List<Mission> missions) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      await isar.missions.putAll(missions);
+    });
+  }
+
+  /// Import stats from MongoDB restore.
+  Future<void> importStats(UserStats stats) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      await isar.userStats.put(stats);
+    });
+  }
+
+  /// Bulk import projects from MongoDB restore.
+  Future<void> importProjects(List<Project> projects) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      await isar.projects.putAll(projects);
     });
   }
 }

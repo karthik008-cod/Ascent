@@ -8,6 +8,11 @@ class MissionRepositoryImpl implements MissionRepository {
   MissionRepositoryImpl(this.dataSource);
 
   @override
+  Future<List<Mission>> getAllMissions() {
+    return dataSource.getAllMissions();
+  }
+
+  @override
   Future<List<Mission>> getMissionsForDate(DateTime date) {
     return dataSource.getMissionsForDate(date);
   }

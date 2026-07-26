@@ -3,6 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/user_stats.dart';
 import '../../../tasks/presentation/providers/data_providers.dart';
 
+class LevelUpEvent {
+  final int oldLevel;
+  final int newLevel;
+  LevelUpEvent(this.oldLevel, this.newLevel);
+}
+
 class LevelSystem {
   /// Total cumulative XP needed to reach [level].
   /// Calibrated so a moderate user (1 Main + 2 Side + 2 Routine = 240 XP/day)
@@ -67,8 +73,8 @@ class UserStatsNotifier extends StateNotifier<AsyncValue<UserStats>> {
     }
   }
 
-  /// Returns the new level if a level-up occurred, null otherwise.
-  Future<int?> addXp(int xp) async {
+  /// Returns the LevelUpEvent if a level-up occurred, null otherwise.
+  Future<LevelUpEvent?> addXp(int xp) async {
     final repository = ref.read(statsRepositoryProvider);
     if (state.value != null) {
       final stats = state.value!;
@@ -80,7 +86,7 @@ class UserStatsNotifier extends StateNotifier<AsyncValue<UserStats>> {
       state = AsyncValue.data(stats);
 
       if (stats.currentLevel > oldLevel) {
-        return stats.currentLevel;
+        return LevelUpEvent(oldLevel, stats.currentLevel);
       }
     }
     return null;

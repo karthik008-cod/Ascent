@@ -57,12 +57,12 @@ String _getMilestoneMessage(int level) {
 }
 
 /// Shows a level-up celebration dialog. Special celebration for every 5th level.
-void showLevelUpCelebration(BuildContext context, int newLevel) {
+void showLevelUpCelebration(BuildContext context, int oldLevel, int newLevel) {
   final isMilestone = newLevel % 5 == 0;
 
   // Find badge for this level
-  final badge = allBadges.where((b) => b.level == newLevel).toList();
-  final hasBadge = badge.isNotEmpty;
+  final badges = allBadges.where((b) => b.level > oldLevel && b.level <= newLevel).toList();
+  final hasBadge = badges.isNotEmpty;
 
   showGeneralDialog(
     context: context,
@@ -105,42 +105,72 @@ void showLevelUpCelebration(BuildContext context, int newLevel) {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Celebration header
-                Text(
-                  isMilestone ? '🎆 MILESTONE! 🎆' : '🎉 LEVEL UP!',
-                  style: TextStyle(
-                    fontSize: isMilestone ? 22 : 18,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 2,
-                    color: isMilestone ? AppColors.accent : AppColors.primary,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (isMilestone) const Text('🎆', style: TextStyle(fontSize: 22)),
+                      if (!isMilestone) const Text('🎉', style: TextStyle(fontSize: 20)),
+                      const SizedBox(width: 8),
+                      Text(
+                        isMilestone ? 'MILESTONE!' : 'LEVEL UP!',
+                        style: TextStyle(
+                          fontSize: isMilestone ? 22 : 18,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2,
+                          color: isMilestone ? AppColors.accent : AppColors.primary,
+                        ),
+                      ),
+                      if (isMilestone) const SizedBox(width: 8),
+                      if (isMilestone) const Text('🎆', style: TextStyle(fontSize: 22)),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 20),
                 // Level circle
-                Container(
-                  width: isMilestone ? 110 : 90,
-                  height: isMilestone ? 110 : 90,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: isMilestone
-                        ? const LinearGradient(colors: [AppColors.accent, Color(0xFFF59E0B)])
-                        : AppColors.primaryGradient,
-                    boxShadow: [
-                      BoxShadow(
-                        color: (isMilestone ? AppColors.accent : AppColors.primary).withOpacity(0.5),
-                        blurRadius: 24,
-                        spreadRadius: 2,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (newLevel > 1)
+                      Text('${newLevel - 1}', style: TextStyle(color: isMilestone ? Colors.white54 : AppColors.primary.withOpacity(0.4), fontSize: 20, fontWeight: FontWeight.bold)),
+                    if (newLevel > 1) const SizedBox(width: 16),
+                    Container(
+                      width: isMilestone ? 110 : 90,
+                      height: isMilestone ? 110 : 90,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: isMilestone
+                            ? const LinearGradient(colors: [AppColors.accent, Color(0xFFF59E0B)])
+                            : AppColors.primaryGradient,
+                        boxShadow: [
+                          BoxShadow(
+                            color: (isMilestone ? AppColors.accent : AppColors.primary).withOpacity(0.5),
+                            blurRadius: 24,
+                            spreadRadius: 2,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('LVL', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 2)),
-                        Text('$newLevel', style: const TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w900)),
-                      ],
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('LVL', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                                Text('$newLevel', style: const TextStyle(color: Colors.white, fontSize: 40, height: 1.0, fontWeight: FontWeight.w900)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 16),
+                    Text('${newLevel + 1}', style: TextStyle(color: isMilestone ? Colors.white54 : AppColors.primary.withOpacity(0.4), fontSize: 20, fontWeight: FontWeight.bold)),
+                  ],
                 ),
                 const SizedBox(height: 20),
                 // Motivational message
@@ -160,28 +190,39 @@ void showLevelUpCelebration(BuildContext context, int newLevel) {
                 if (hasBadge) ...[
                   const SizedBox(height: 18),
                   Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.primary.withOpacity(0.3)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(badge.first.emoji, style: const TextStyle(fontSize: 28)),
-                        const SizedBox(width: 12),
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('BADGE UNLOCKED!', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1, color: AppColors.accent)),
-                              Text(badge.first.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: isMilestone ? Colors.white : null)),
-                              Text(badge.first.desc, style: TextStyle(fontSize: 11, color: isMilestone ? Colors.white70 : AppColors.primary)),
-                            ],
-                          ),
-                        ),
-                      ],
+                    constraints: const BoxConstraints(maxHeight: 180),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: badges.map((badge) {
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(badge.emoji, style: const TextStyle(fontSize: 28)),
+                                const SizedBox(width: 12),
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('BADGE UNLOCKED!', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1, color: AppColors.accent)),
+                                      Text(badge.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: isMilestone ? Colors.white : null)),
+                                      Text(badge.desc, style: TextStyle(fontSize: 11, color: isMilestone ? Colors.white70 : AppColors.primary)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
                 ],
@@ -189,16 +230,28 @@ void showLevelUpCelebration(BuildContext context, int newLevel) {
                 // Close button
                 SizedBox(
                   width: double.infinity,
-                  height: 46,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       backgroundColor: isMilestone ? AppColors.accent : AppColors.primary,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                     onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      isMilestone ? 'Celebrate! 🥳' : 'Continue →',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          isMilestone ? 'Celebrate!' : 'Continue',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        const SizedBox(width: 6),
+                        if (isMilestone) const Padding(
+                          padding: EdgeInsets.only(bottom: 2.0),
+                          child: Text('🥳', style: TextStyle(fontSize: 16)),
+                        ),
+                        if (!isMilestone) const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
+                      ],
                     ),
                   ),
                 ),
