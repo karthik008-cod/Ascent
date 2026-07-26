@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../features/tasks/data/models/mission.dart';
 import '../../features/tasks/data/models/project.dart';
 import '../../features/progress/data/models/user_stats.dart';
 
 class MongoDataSource {
-  static String get _baseUrl => dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:3000/api';
+  static const String _baseUrl = String.fromEnvironment(
+    'API_URL',
+    defaultValue: 'https://ascent-1-7wj7.onrender.com/api',
+  );
 
   Future<void> connect() async {}
   Future<void> disconnect() async {}
