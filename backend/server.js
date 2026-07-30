@@ -87,6 +87,13 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
+// Debug env endpoint
+app.get('/api/debug-env', (req, res) => {
+  const uri = process.env.MONGO_URI || '';
+  const maskedUri = uri.replace(/:([^:@]+)@/, ':***@');
+  res.status(200).json({ mongoUri: maskedUri, nodeVersion: process.version });
+});
+
 // Start Server
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Ascent Backend API listening on port ${PORT}`);
