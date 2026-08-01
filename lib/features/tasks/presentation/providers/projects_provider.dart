@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/project.dart';
 import './data_providers.dart';
 
@@ -52,5 +53,6 @@ class ProjectsNotifier extends StateNotifier<AsyncValue<List<Project>>> {
 }
 
 final projectsNotifierProvider = StateNotifierProvider<ProjectsNotifier, AsyncValue<List<Project>>>((ref) {
+  ref.watch(authNotifierProvider);
   return ProjectsNotifier(ref);
 });

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/mission.dart';
 import '../../../../core/services/notification_service.dart';
 import './data_providers.dart';
@@ -67,6 +68,7 @@ class MissionNotifier extends StateNotifier<AsyncValue<List<Mission>>> {
 }
 
 final missionNotifierProvider = StateNotifierProvider<MissionNotifier, AsyncValue<List<Mission>>>((ref) {
+  ref.watch(authNotifierProvider);
   return MissionNotifier(ref);
 });
 

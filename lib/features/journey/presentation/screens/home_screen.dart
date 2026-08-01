@@ -8,8 +8,14 @@ import '../../../tasks/data/models/mission.dart';
 import 'package:go_router/go_router.dart';
 import '../../../tasks/presentation/screens/add_mission_screen.dart';
 import '../../../tasks/presentation/widgets/filter_sort_bar.dart';
-import '../../../profile/presentation/widgets/settings_drawer.dart';
+import '../../../profile/presentation/screens/settings_screen.dart';
 import '../../../progress/presentation/widgets/level_up_celebration.dart';
+import '../../../../core/widgets/climbing_dots_loader.dart';
+import '../../../../core/widgets/character_empty_box.dart';
+import '../../../../core/widgets/scroll_bender.dart';
+import '../../../../core/widgets/swipeable_mission_card.dart';
+import '../../../progress/presentation/providers/user_stats_provider.dart';
+import '../../../tasks/presentation/providers/projects_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -19,6 +25,13 @@ class HomeScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final missionsAsync = ref.watch(todayMissionsProvider);
     final currentFilter = ref.watch(missionFilterProvider);
+
+    Future<void> _onRefresh() async {
+      ref.invalidate(missionNotifierProvider);
+      ref.invalidate(userStatsNotifierProvider);
+      ref.invalidate(projectsNotifierProvider);
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -70,7 +83,18 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: 10),
                       GestureDetector(
-                        onTap: () => SettingsDrawer.show(context, ref),
+                        onTap: () {
+                          Navigator.of(context).push(PageRouteBuilder(
+                            transitionDuration: const Duration(milliseconds: 600),
+                            reverseTransitionDuration: const Duration(milliseconds: 500),
+                            pageBuilder: (context, animation, secondaryAnimation) {
+                              return FadeTransition(
+                                opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                                child: const SettingsScreen(),
+                              );
+                            },
+                          ));
+                        },
                         child: Container(
                           width: 38,
                           height: 38,
@@ -79,9 +103,12 @@ class HomeScreen extends ConsumerWidget {
                             border: Border.all(color: AppColors.primary.withOpacity(0.6), width: 1.5),
                           ),
                           child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/logo.png',
-                              fit: BoxFit.cover,
+                            child: Hero(
+                              tag: 'logo_hero',
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
@@ -105,26 +132,38 @@ class HomeScreen extends ConsumerWidget {
                   final routines = missions.where((m) => m.type == MissionType.routine).toList();
 
                   if (missions.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    return RefreshIndicator(
+                      onRefresh: _onRefresh,
+                      color: AppColors.primary,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
                         children: [
-                          Icon(Icons.track_changes_rounded, size: 64, color: isDark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight),
-                          const SizedBox(height: 16),
-                          Text('No missions assigned for today\'s priority.', style: Theme.of(context).textTheme.bodyLarge),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.15),
+                          const Center(
+                            child: CharacterEmptyBox(text: 'No missions assigned for today\'s priority.'),
+                          ),
                         ],
                       ),
                     );
                   }
 
-                  return ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-                    children: [
-                      if (mainMissions.isEmpty && sideMissions.isEmpty && routines.isEmpty && currentFilter != 'All') ...[
-                        const SizedBox(height: 40),
-                        Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      ref.invalidate(missionNotifierProvider);
+                      ref.invalidate(userStatsNotifierProvider);
+                      ref.invalidate(projectsNotifierProvider);
+                    },
+                    color: AppColors.primary,
+                    child: ScrollVelocityTracker(
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                        children: [
+                          if (mainMissions.isEmpty && sideMissions.isEmpty && routines.isEmpty && currentFilter != 'All') ...[
+                            const SizedBox(height: 40),
+                            Center(
+                              child: Container(
+                                padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
                               color: isDark ? AppColors.surface : AppColors.lightSurface,
                               borderRadius: BorderRadius.circular(20),
@@ -206,11 +245,13 @@ class HomeScreen extends ConsumerWidget {
                         if (routines.isEmpty)
                           _buildEmptyGoalBox(context, 'No routines set for consistent daily wins!'),
                         const SizedBox(height: 32),
-                      ],
-                    ],
-                  );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
+                      ], // closes if routines
+                    ], // closes children
+                  ), // closes ListView
+                 ), // closes ScrollVelocityTracker
+                ); // closes RefreshIndicator
+              },
+              loading: () => const Center(child: ClimbingDotsLoader()),
                 error: (e, st) => Center(child: Text('Error: $e')),
               ),
             ),
@@ -280,13 +321,25 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildMainGoalCard(BuildContext context, WidgetRef ref, Mission mission) {
-    return GestureDetector(
-      onTap: () {
-        context.push('/add-task', extra: mission);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.all(20),
+    return ScrollBender(
+      child: SwipeableMissionCard(
+        mission: mission,
+        onComplete: () async {
+          final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+          if (event != null && context.mounted) {
+            showLevelUpCelebration(context, event.oldLevel, event.newLevel);
+          }
+        },
+        onDelete: () async {
+          await ref.read(missionNotifierProvider.notifier).deleteMission(mission.id);
+        },
+        child: GestureDetector(
+          onTap: () {
+            context.push('/add-task', extra: mission);
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(26),
           gradient: mission.isCompleted 
@@ -352,17 +405,31 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
+     ),
+    ),
+   );
   }
 
   Widget _buildSideGoalCard(BuildContext context, WidgetRef ref, Mission mission) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GestureDetector(
-      onTap: () {
-        context.push('/add-task', extra: mission);
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
+    return ScrollBender(
+      child: SwipeableMissionCard(
+        mission: mission,
+        onComplete: () async {
+          final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+          if (event != null && context.mounted) {
+            showLevelUpCelebration(context, event.oldLevel, event.newLevel);
+          }
+        },
+        onDelete: () async {
+          await ref.read(missionNotifierProvider.notifier).deleteMission(mission.id);
+        },
+        child: GestureDetector(
+          onTap: () {
+            context.push('/add-task', extra: mission);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isDark ? AppColors.surface : AppColors.lightSurface,
           borderRadius: BorderRadius.circular(20),
@@ -422,13 +489,27 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
+     ),
+    ),
+   );
   }
 
   Widget _buildRoutineTile(BuildContext context, WidgetRef ref, Mission mission) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+    return ScrollBender(
+      child: SwipeableMissionCard(
+        mission: mission,
+        onComplete: () async {
+          final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+          if (event != null && context.mounted) {
+            showLevelUpCelebration(context, event.oldLevel, event.newLevel);
+          }
+        },
+        onDelete: () async {
+          await ref.read(missionNotifierProvider.notifier).deleteMission(mission.id);
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 8),
       child: Material(
         color: (isDark ? AppColors.surface : AppColors.lightSurface).withOpacity(0.7),
         borderRadius: BorderRadius.circular(16),
@@ -473,7 +554,9 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ),
-    );
+     ),
+    ),
+   );
   }
 
   Widget _buildEmptyGoalBox(BuildContext context, String message) {

@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/missions_provider.dart';
+import '../providers/projects_provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../data/models/mission.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/add_mission_screen.dart';
 import '../widgets/filter_sort_bar.dart';
-import '../../../profile/presentation/widgets/settings_drawer.dart';
+import '../../../profile/presentation/screens/settings_screen.dart';
 import '../../../progress/presentation/widgets/level_up_celebration.dart';
+import '../../../progress/presentation/providers/user_stats_provider.dart';
+import '../../../../core/widgets/climbing_dots_loader.dart';
+import '../../../../core/widgets/character_empty_box.dart';
+import '../../../../core/widgets/scroll_bender.dart';
+import '../../../../core/widgets/swipeable_mission_card.dart';
 
 class PlannerScreen extends ConsumerWidget {
   const PlannerScreen({super.key});
@@ -17,6 +23,13 @@ class PlannerScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final missionsAsync = ref.watch(filteredSortedMissionsProvider);
+
+    Future<void> _onRefresh() async {
+      ref.invalidate(missionNotifierProvider);
+      ref.invalidate(userStatsNotifierProvider);
+      ref.invalidate(projectsNotifierProvider);
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -50,7 +63,18 @@ class PlannerScreen extends ConsumerWidget {
                     ],
                   ),
                   GestureDetector(
-                    onTap: () => SettingsDrawer.show(context, ref),
+                    onTap: () {
+                      Navigator.of(context).push(PageRouteBuilder(
+                        transitionDuration: const Duration(milliseconds: 600),
+                        reverseTransitionDuration: const Duration(milliseconds: 500),
+                        pageBuilder: (context, animation, secondaryAnimation) {
+                          return FadeTransition(
+                            opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                            child: const SettingsScreen(),
+                          );
+                        },
+                      ));
+                    },
                     child: Container(
                       width: 38,
                       height: 38,
@@ -59,9 +83,12 @@ class PlannerScreen extends ConsumerWidget {
                         border: Border.all(color: AppColors.primary.withOpacity(0.6), width: 1.5),
                       ),
                       child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          fit: BoxFit.cover,
+                        child: Hero(
+                          tag: 'logo_hero',
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
@@ -78,13 +105,16 @@ class PlannerScreen extends ConsumerWidget {
               data: (missions) {
                 if (missions.isEmpty) {
                   return Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    child: RefreshIndicator(
+                      onRefresh: _onRefresh,
+                      color: AppColors.primary,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
                         children: [
-                          Icon(Icons.inbox_rounded, size: 64, color: isDark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight),
-                          const SizedBox(height: 16),
-                          Text('No tasks right now.', style: Theme.of(context).textTheme.bodyLarge),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.15),
+                          const Center(
+                            child: CharacterEmptyBox(text: 'No tasks right now.'),
+                          ),
                         ],
                       ),
                     ),
@@ -92,17 +122,24 @@ class PlannerScreen extends ConsumerWidget {
                 }
 
                 return Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    itemCount: missions.length,
-                    itemBuilder: (context, index) {
-                      final mission = missions[index];
-                      return _buildPlannerTile(context, ref, mission);
-                    },
+                  child: RefreshIndicator(
+                    onRefresh: _onRefresh,
+                    color: AppColors.primary,
+                    child: ScrollVelocityTracker(
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        itemCount: missions.length,
+                        itemBuilder: (context, index) {
+                          final mission = missions[index];
+                          return _buildPlannerTile(context, ref, mission);
+                        },
+                      ),
+                    ),
                   ),
                 );
               },
-              loading: () => const Expanded(child: Center(child: CircularProgressIndicator())),
+              loading: () => const Expanded(child: Center(child: ClimbingDotsLoader())),
               error: (e, st) => Expanded(child: Center(child: Text('Error: $e'))),
             ),
           ],
@@ -122,8 +159,20 @@ class PlannerScreen extends ConsumerWidget {
 
   Widget _buildPlannerTile(BuildContext context, WidgetRef ref, Mission mission) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+    return ScrollBender(
+      child: SwipeableMissionCard(
+        mission: mission,
+        onComplete: () async {
+          final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+          if (event != null && context.mounted) {
+            showLevelUpCelebration(context, event.oldLevel, event.newLevel);
+          }
+        },
+        onDelete: () async {
+          await ref.read(missionNotifierProvider.notifier).deleteMission(mission.id);
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
       child: Material(
         color: isDark ? AppColors.surface : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(20),
@@ -209,7 +258,9 @@ class PlannerScreen extends ConsumerWidget {
           ),
         ),
       ),
-    );
+     ),
+    ),
+   );
   }
 
   Color _getTypeColor(MissionType type) {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as _math;
+import 'package:isar/isar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/services/email_service.dart';
@@ -22,8 +23,8 @@ class AuthUser {
     required this.email,
     required this.name,
     this.bio = 'Leveling up daily in tech, habits & productivity.',
-    this.role = 'Ascent Pioneer',
-    this.socialHandle = '@yuvaan_dev',
+    this.role = 'Novice Explorer',
+    this.socialHandle = '@new_user',
     this.motto = '1% better every single day.',
   });
 
@@ -33,8 +34,8 @@ class AuthUser {
       email: map['email'] ?? '',
       name: map['name'] ?? 'Yuvaan',
       bio: map['bio'] ?? 'Leveling up daily in tech, habits & productivity.',
-      role: map['role'] ?? 'Ascent Pioneer',
-      socialHandle: map['socialHandle'] ?? '@yuvaan_dev',
+      role: map['role'] ?? 'Novice Explorer',
+      socialHandle: map['socialHandle'] ?? '@new_user',
       motto: map['motto'] ?? '1% better every single day.',
     );
   }
@@ -146,32 +147,36 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
       }
       
       // Restore missions
-      final missionDocs = data['missions'] as List<Map<String, dynamic>>? ?? [];
+      final missionDocs = data['missions'] as List<dynamic>? ?? [];
       if (missionDocs.isNotEmpty) {
         final missions = missionDocs.map((doc) {
+          final docMap = doc as Map<String, dynamic>;
           final m = Mission()
-            ..title = doc['title'] ?? ''
-            ..description = doc['description']
-            ..type = MissionType.values[doc['type'] ?? 0]
-            ..xpReward = doc['xpReward'] ?? 0
-            ..isCompleted = doc['isCompleted'] ?? false
-            ..date = DateTime.tryParse(doc['date'] ?? '') ?? DateTime.now()
-            ..projectId = doc['projectId'];
+            ..id = docMap['id'] ?? Isar.autoIncrement
+            ..title = docMap['title'] ?? ''
+            ..description = docMap['description']
+            ..type = MissionType.values[docMap['type'] ?? 0]
+            ..xpReward = docMap['xpReward'] ?? 0
+            ..isCompleted = docMap['isCompleted'] ?? false
+            ..date = DateTime.tryParse(docMap['date'] ?? '') ?? DateTime.now()
+            ..projectId = docMap['projectId'];
           return m;
         }).toList();
         await isar.importMissions(missions);
       }
       
       // Restore projects
-      final projectDocs = data['projects'] as List<Map<String, dynamic>>? ?? [];
+      final projectDocs = data['projects'] as List<dynamic>? ?? [];
       if (projectDocs.isNotEmpty) {
         final projects = projectDocs.map((doc) {
+          final docMap = doc as Map<String, dynamic>;
           final p = Project()
-            ..title = doc['title'] ?? ''
-            ..description = doc['description']
-            ..notes = doc['notes']
-            ..progress = (doc['progress'] ?? 0.0).toDouble()
-            ..createdAt = DateTime.tryParse(doc['createdAt'] ?? '') ?? DateTime.now();
+            ..id = docMap['id'] ?? Isar.autoIncrement
+            ..title = docMap['title'] ?? ''
+            ..description = docMap['description']
+            ..notes = docMap['notes']
+            ..progress = (docMap['progress'] ?? 0.0).toDouble()
+            ..createdAt = DateTime.tryParse(docMap['createdAt'] ?? '') ?? DateTime.now();
           return p;
         }).toList();
         await isar.importProjects(projects);
@@ -183,6 +188,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
   }
 
   Future<void> switchAccount(AuthUser user) async {
+    state = const AsyncValue.loading();
     // 1. Backup current user's data to MongoDB
     await _backupCurrentUser();
     
@@ -264,6 +270,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
   }
 
   Future<void> signIn(String email, String password) async {
+    state = const AsyncValue.loading();
     try {
       // Backup current user before switching
       await _backupCurrentUser();
@@ -291,6 +298,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
   }
 
   Future<void> loginWithOtp(String email) async {
+    state = const AsyncValue.loading();
     try {
       // Backup current user before switching
       await _backupCurrentUser();
@@ -318,6 +326,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
   }
 
   Future<void> signUp(String email, String password, String name) async {
+    state = const AsyncValue.loading();
     try {
       // Backup current user before switching
       await _backupCurrentUser();
@@ -357,6 +366,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
   }
 
   Future<void> signOut() async {
+    state = const AsyncValue.loading();
     // Backup before signing out
     await _backupCurrentUser();
     

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/user_stats.dart';
 import '../../../tasks/presentation/providers/data_providers.dart';
 
@@ -106,5 +107,6 @@ class UserStatsNotifier extends StateNotifier<AsyncValue<UserStats>> {
 }
 
 final userStatsNotifierProvider = StateNotifierProvider<UserStatsNotifier, AsyncValue<UserStats>>((ref) {
+  ref.watch(authNotifierProvider);
   return UserStatsNotifier(ref);
 });
