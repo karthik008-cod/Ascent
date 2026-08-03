@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Mission = require('../models/Mission');
 const Project = require('../models/Project');
@@ -18,7 +19,7 @@ router.post('/check', async (req, res) => {
 router.post('/signup', async (req, res) => {
   console.log('[AUTH] Starting signup process...');
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, bio, role, socialHandle, motto } = req.body;
     console.log(`[AUTH] Checking if user exists: ${email}`);
     let user = await User.findOne({ email });
     if (user) {
@@ -27,7 +28,15 @@ router.post('/signup', async (req, res) => {
     }
     const mongoose = require('mongoose');
     const _id = new mongoose.Types.ObjectId().toHexString();
-    user = new User({ _id, email, password, name });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const userData = { _id, email, password: hashedPassword, name };
+    if (bio) userData.bio = bio;
+    if (role) userData.role = role;
+    if (socialHandle) userData.socialHandle = socialHandle;
+    if (motto) userData.motto = motto;
+    
+    user = new User(userData);
     console.log(`[AUTH] Creating new user: ${email} with ID: ${_id}`);
     await user.save();
     console.log('[AUTH] Signup successful');
@@ -43,8 +52,13 @@ router.post('/signin', async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log(`[AUTH] Searching for user: ${email}`);
-    const user = await User.findOne({ email, password });
+    const user = await User.findOne({ email });
     if (!user) {
+      console.warn(`[AUTH] Signin failed: Invalid email ${email}`);
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       console.warn(`[AUTH] Signin failed: Invalid credentials for ${email}`);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -77,7 +91,8 @@ router.post('/signin-email', async (req, res) => {
 router.put('/password', async (req, res) => {
   try {
     const { email, newPassword } = req.body;
-    await User.updateOne({ email }, { password: newPassword });
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await User.updateOne({ email }, { password: hashedPassword });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
