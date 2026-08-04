@@ -99,6 +99,23 @@ router.put('/password', async (req, res) => {
   }
 });
 
+router.put('/profile', async (req, res) => {
+  try {
+    const { email, name, bio, role, socialHandle, motto } = req.body;
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (bio) updateData.bio = bio;
+    if (role) updateData.role = role;
+    if (socialHandle) updateData.socialHandle = socialHandle;
+    if (motto) updateData.motto = motto;
+    
+    await User.updateOne({ email }, updateData);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.delete('/:email', async (req, res) => {
   try {
     const { email } = req.params;

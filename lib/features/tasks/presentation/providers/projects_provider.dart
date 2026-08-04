@@ -4,13 +4,19 @@ import '../../data/models/project.dart';
 import './data_providers.dart';
 
 class ProjectsNotifier extends StateNotifier<AsyncValue<List<Project>>> {
-  ProjectsNotifier(this.ref) : super(const AsyncValue.loading()) {
-    loadProjects();
+  ProjectsNotifier(this.ref, {bool loadImmediately = true}) : super(const AsyncValue.loading()) {
+    if (loadImmediately) {
+      _loadProjects();
+    }
+  }
+
+  void setLoading() {
+    state = const AsyncValue.loading();
   }
 
   final Ref ref;
 
-  Future<void> loadProjects() async {
+  Future<void> _loadProjects() async {
     state = const AsyncValue.loading();
     try {
       final repository = ref.read(projectRepositoryProvider);
@@ -35,24 +41,27 @@ class ProjectsNotifier extends StateNotifier<AsyncValue<List<Project>>> {
       ..notes = notes
       ..createdAt = DateTime.now();
     await repository.saveProject(project);
-    await loadProjects();
+    await _loadProjects();
   }
 
   Future<void> updateProject(Project project) async {
     final repository = ref.read(projectRepositoryProvider);
     project.progress = project.progress.clamp(0.0, 1.0);
     await repository.saveProject(project);
-    await loadProjects();
+    await _loadProjects();
   }
 
   Future<void> deleteProject(int id) async {
     final repository = ref.read(projectRepositoryProvider);
     await repository.deleteProject(id);
-    await loadProjects();
+    await _loadProjects();
   }
 }
 
 final projectsNotifierProvider = StateNotifierProvider<ProjectsNotifier, AsyncValue<List<Project>>>((ref) {
-  ref.watch(authNotifierProvider);
-  return ProjectsNotifier(ref);
+  final authState = ref.watch(authNotifierProvider);
+  if (authState.isLoading) {
+    return ProjectsNotifier(ref, loadImmediately: false)..setLoading();
+  }
+  return ProjectsNotifier(ref, loadImmediately: true);
 });

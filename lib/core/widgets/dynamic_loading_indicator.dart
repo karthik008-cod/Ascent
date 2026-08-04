@@ -11,7 +11,7 @@ class DynamicLoadingIndicator extends StatefulWidget {
   const DynamicLoadingIndicator({
     super.key,
     required this.messages,
-    this.interval = const Duration(milliseconds: 1500),
+    this.interval = const Duration(milliseconds: 3000),
     this.color,
     this.textStyle,
     this.isHorizontal = false,
@@ -32,7 +32,11 @@ class _DynamicLoadingIndicatorState extends State<DynamicLoadingIndicator> {
       _timer = Timer.periodic(widget.interval, (timer) {
         if (!mounted) return;
         setState(() {
-          _currentIndex = (_currentIndex + 1) % widget.messages.length;
+          if (_currentIndex < widget.messages.length - 1) {
+            _currentIndex++;
+          } else {
+            timer.cancel();
+          }
         });
       });
     }

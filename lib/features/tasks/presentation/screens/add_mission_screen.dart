@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../providers/missions_provider.dart';
 import '../../data/models/mission.dart';
+import '../../data/models/subtask.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../core/widgets/shake_widget.dart';
@@ -26,11 +27,11 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
   int _titleErrorShakeCount = 0;
   
   MissionType _selectedType = MissionType.side;
-  final List<String> _checklist = [];
+  final List<Subtask> _checklist = [];
   
   // Scheduling
   late DateTime _startDate;
-  String _repeatMode = 'Never'; // 'Never', 'Daily', 'Weekly', 'Custom Days'
+  String _repeatMode = 'Once'; // 'Once', 'Daily', 'Weekly'
   final Set<int> _selectedDays = {}; // 1 = Mon, 7 = Sun
   
   // Reminders & Tags
@@ -57,7 +58,15 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
         final notesLines = <String>[];
         for (final line in lines) {
           if (line.startsWith('• ')) {
-            _checklist.add(line.substring(2));
+            String subtaskText = line.substring(2);
+            bool isCompleted = false;
+            if (subtaskText.startsWith('[ ] ')) {
+               subtaskText = subtaskText.substring(4);
+            } else if (subtaskText.startsWith('[x] ')) {
+               subtaskText = subtaskText.substring(4);
+               isCompleted = true;
+            }
+            _checklist.add(Subtask(subtaskText, isCompleted));
           } else if (line.startsWith('Tags: ')) {
             final tags = line.substring(6).split(' ');
             for (final t in tags) {
@@ -72,32 +81,25 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
               _repeatMode = 'Daily';
             } else if (repeatStr.startsWith('Weekly')) {
               _repeatMode = 'Weekly';
-              final match = RegExp(r'Days:\s*([0-9,\s]+)').firstMatch(repeatStr);
+              final match = RegExp(r'Days:\s*([0-9a-zA-Z,\s]+)').firstMatch(repeatStr);
               if (match != null && match.group(1) != null) {
                 _selectedDays.clear();
+                final reverseMap = {'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6, 'Sun': 7};
                 for (final s in match.group(1)!.split(',')) {
-                  final d = int.tryParse(s.trim());
-                  if (d != null) _selectedDays.add(d);
+                  final val = s.trim();
+                  if (reverseMap.containsKey(val)) {
+                    _selectedDays.add(reverseMap[val]!);
+                  } else {
+                    final d = int.tryParse(val);
+                    if (d != null) _selectedDays.add(d);
+                  }
                 }
               } else {
                 _selectedDays.clear();
                 _selectedDays.add(_startDate.weekday);
               }
-            } else if (repeatStr.startsWith('Custom Days')) {
-              _repeatMode = 'Custom Days';
-              final match = RegExp(r'Days:\s*([0-9,\s]+)').firstMatch(repeatStr);
-              if (match != null && match.group(1) != null) {
-                _selectedDays.clear();
-                for (final s in match.group(1)!.split(',')) {
-                  final d = int.tryParse(s.trim());
-                  if (d != null) _selectedDays.add(d);
-                }
-              } else {
-                _selectedDays.clear();
-                _selectedDays.addAll([1, 2, 3, 4, 5]);
-              }
             } else {
-              _repeatMode = 'Never';
+              _repeatMode = 'Once';
             }
           } else if (line.startsWith('Reminder: ')) {
             // keep noted
@@ -130,7 +132,7 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
     final text = _checklistInputController.text.trim();
     if (text.isNotEmpty) {
       setState(() {
-        _checklist.add(text);
+        _checklist.add(Subtask(text, false));
         _checklistInputController.clear();
       });
     }
@@ -230,20 +232,20 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
     if (_checklist.isNotEmpty) {
       buffer.writeln('\nSubtasks:');
       for (final item in _checklist) {
-        buffer.writeln('• $item');
+        buffer.writeln('• [${item.isCompleted ? 'x' : ' '}] ${item.text}');
       }
     }
-    if (_repeatMode != 'Never') {
-      if (_repeatMode == 'Weekly' || _repeatMode == 'Custom Days') {
-        final sortedDays = _selectedDays.toList()..sort();
-        if (sortedDays.isNotEmpty) {
-          buffer.writeln('\nRepeats: $_repeatMode (Days: ${sortedDays.join(', ')})');
-        } else {
-          buffer.writeln('\nRepeats: $_repeatMode');
-        }
+    if (_repeatMode == 'Weekly') {
+      final sortedDays = _selectedDays.toList()..sort();
+      if (sortedDays.isNotEmpty) {
+        final dayNamesMap = {1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat', 7: 'Sun'};
+        final sortedDaysStr = sortedDays.map((d) => dayNamesMap[d]!).join(', ');
+        buffer.writeln('\nRepeats: $_repeatMode (Days: $sortedDaysStr)');
       } else {
         buffer.writeln('\nRepeats: $_repeatMode');
       }
+    } else {
+      buffer.writeln('\nRepeats: $_repeatMode');
     }
     if (_reminderTime != null) {
       buffer.writeln('\nReminder: ${_reminderTime!.format(context)}');
@@ -257,9 +259,7 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
     }
 
     final actualRepeatMode = _syncReminderWithMissionRepeat
-        ? (_repeatMode == 'Daily' || _repeatMode == 'Custom Days'
-            ? 'Daily'
-            : (_repeatMode == 'Weekly' ? 'Weekly' : 'Once'))
+        ? (_repeatMode == 'Once' ? 'Once' : (_repeatMode == 'Daily' ? 'Daily' : 'Weekly'))
         : _reminderRepeatMode;
 
     if (widget.existingMission != null) {
@@ -276,7 +276,10 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
           id: mission.id,
           title: 'Ascent Reminder: ${mission.title}',
           body: 'It is time to focus on your mission!',
-          scheduledTime: _reminderTime!,
+          scheduledDateTime: DateTime(
+            _startDate.year, _startDate.month, _startDate.day,
+            _reminderTime!.hour, _reminderTime!.minute,
+          ),
           repeatMode: actualRepeatMode,
         );
       } else {
@@ -297,7 +300,10 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
           id: mission.id,
           title: 'Ascent Reminder: ${mission.title}',
           body: 'It is time to focus on your mission!',
-          scheduledTime: _reminderTime!,
+          scheduledDateTime: DateTime(
+            _startDate.year, _startDate.month, _startDate.day,
+            _reminderTime!.hour, _reminderTime!.minute,
+          ),
           repeatMode: actualRepeatMode,
         );
       }
@@ -313,6 +319,7 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
       initialDate: _startDate,
       firstDate: DateTime(2025),
       lastDate: DateTime(2030),
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -391,6 +398,41 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
             child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Sticky Title Input
+              ShakeWidget(
+                key: ValueKey(_titleErrorShakeCount),
+                shouldShake: _titleHasError,
+                child: TextField(
+                  controller: _titleController,
+                  textInputAction: TextInputAction.next,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+                  onChanged: (val) {
+                    if (_titleHasError && val.trim().isNotEmpty) setState(() => _titleHasError = false);
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Mission Title *',
+                    hintText: 'e.g., Complete System Design Chapter',
+                    errorText: _titleHasError ? 'Mission Title cannot be empty' : null,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: _titleHasError ? AppColors.error : Theme.of(context).colorScheme.surfaceContainerHighest,
+                        width: _titleHasError ? 2 : 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: _titleHasError ? AppColors.error : AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
               // Scrollable form contents
               Expanded(
                 child: SingleChildScrollView(
@@ -398,48 +440,17 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildSectionCard(
-                    title: 'MISSION DETAILS',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Title Input
-                        ShakeWidget(
-                          key: ValueKey(_titleErrorShakeCount),
-                          shouldShake: _titleHasError,
-                          child: TextField(
-                            controller: _titleController,
-                            textInputAction: TextInputAction.next,
-                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-                            onChanged: (val) {
-                              if (_titleHasError && val.trim().isNotEmpty) setState(() => _titleHasError = false);
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Mission Title *',
-                              hintText: 'e.g., Complete System Design Chapter',
-                              errorText: _titleHasError ? 'Mission Title cannot be empty' : null,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                  color: _titleHasError ? AppColors.error : Theme.of(context).colorScheme.surfaceContainerHighest,
-                                  width: _titleHasError ? 2 : 1,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Description Input
-                        TextField(
-                          controller: _descController,
-                          maxLines: 2,
-                          textInputAction: TextInputAction.done,
-                          decoration: const InputDecoration(
-                            labelText: 'Notes & Description (Optional)',
-                            hintText: 'Add details, context, or key objectives...',
-                          ),
-                        ),
-                      ],
+                    title: 'NOTES & DESCRIPTION',
+                    child: TextField(
+                      controller: _descController,
+                      maxLines: 3,
+                      textInputAction: TextInputAction.done,
+                      decoration: const InputDecoration(
+                        labelText: 'Notes (Optional)',
+                        hintText: 'Add details, context, or key objectives...',
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+                      ),
                     ),
                   ),
 
@@ -472,9 +483,22 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.check_box_outline_blank_rounded, size: 20, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                                IconButton(
+                                  icon: Icon(
+                                    _checklist[i].isCompleted ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
+                                    size: 20,
+                                    color: _checklist[i].isCompleted ? AppColors.success : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                                  ),
+                                  constraints: const BoxConstraints(),
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () {
+                                    setState(() {
+                                      _checklist[i].isCompleted = !_checklist[i].isCompleted;
+                                    });
+                                  },
+                                ),
                                 const SizedBox(width: 12),
-                                Expanded(child: Text(_checklist[i], style: TextStyle(fontSize: 14))),
+                                Expanded(child: Text(_checklist[i].text, style: TextStyle(fontSize: 14, decoration: _checklist[i].isCompleted ? TextDecoration.lineThrough : null))),
                                 IconButton(
                                   icon: Icon(Icons.close_rounded, size: 18, color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                                   constraints: const BoxConstraints(),
@@ -565,7 +589,7 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
                                     isExpanded: true,
                                     dropdownColor: Theme.of(context).colorScheme.surface,
                                     icon: Icon(Icons.repeat_rounded, color: AppColors.primary, size: 20),
-                                    items: ['Never', 'Daily', 'Weekly', 'Custom Days'].map((mode) {
+                                    items: ['Once', 'Daily', 'Weekly'].map((mode) {
                                       return DropdownMenuItem(
                                         value: mode,
                                         child: Text(mode, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
@@ -577,8 +601,6 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
                                           _repeatMode = val;
                                           if (_repeatMode == 'Weekly' && _selectedDays.isEmpty) {
                                             _selectedDays.add(_startDate.weekday);
-                                          } else if (_repeatMode == 'Custom Days' && _selectedDays.isEmpty) {
-                                            _selectedDays.addAll([1, 2, 3, 4, 5]);
                                           }
                                         });
                                       }
@@ -589,7 +611,7 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
                             ),
                           ],
                         ),
-                        if (_repeatMode == 'Custom Days' || _repeatMode == 'Weekly') ...[
+                        if (_repeatMode == 'Weekly') ...[
                           const SizedBox(height: 12),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

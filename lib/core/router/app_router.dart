@@ -77,6 +77,59 @@ Page<dynamic> _buildPageWithDefaultTransition<T>({
   );
 }
 
+Page<dynamic> _buildPageWithTurnTransition<T>({
+  required BuildContext context, 
+  required GoRouterState state, 
+  required Widget child,
+}) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 600),
+    reverseTransitionDuration: const Duration(milliseconds: 400),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      // Bottom-up vertical scroll/unroll animation
+      final slideAnimation = Tween<Offset>(
+        begin: const Offset(0.0, 0.6),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+      ));
+
+      final rotateAnimation = Tween<double>(
+        begin: -0.15,
+        end: 0.0,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+      ));
+
+      final fadeAnimation = Tween<double>(
+        begin: 0.0,
+        end: 1.0,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeIn),
+      ));
+
+      return FadeTransition(
+        opacity: fadeAnimation,
+        child: SlideTransition(
+          position: slideAnimation,
+          child: Transform(
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001)
+              ..rotateX(rotateAnimation.value),
+            alignment: Alignment.bottomCenter,
+            child: child,
+          ),
+        ),
+      );
+    },
+  );
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = _GoRouterRefreshNotifier(ref);
 
@@ -146,7 +199,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/add-task',
         pageBuilder: (context, state) {
           final extra = state.extra;
-          return _buildPageWithDefaultTransition(
+          return _buildPageWithTurnTransition(
             context: context,
             state: state,
             child: AddMissionScreen(

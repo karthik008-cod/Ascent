@@ -5,6 +5,7 @@ import '../../../tasks/presentation/providers/missions_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../tasks/data/models/mission.dart';
+import '../../../tasks/data/models/subtask.dart';
 import 'package:go_router/go_router.dart';
 import '../../../tasks/presentation/screens/add_mission_screen.dart';
 import '../../../tasks/presentation/widgets/filter_sort_bar.dart';
@@ -127,11 +128,16 @@ class HomeScreen extends ConsumerWidget {
             Expanded(
               child: missionsAsync.when(
                 data: (missions) {
-                  final mainMissions = missions.where((m) => m.type == MissionType.main).toList();
-                  final sideMissions = missions.where((m) => m.type == MissionType.side).toList();
-                  final routines = missions.where((m) => m.type == MissionType.routine).toList();
+                  // Only show incomplete missions on the home page focus board
+                  final currentWeekday = DateTime.now().weekday;
+                  final mainMissions = missions.where((m) => m.type == MissionType.main && !isMissionCompletedForDay(m, currentWeekday)).toList();
+                  final sideMissions = missions.where((m) => m.type == MissionType.side && !isMissionCompletedForDay(m, currentWeekday)).toList();
+                  final routines = missions.where((m) => m.type == MissionType.routine && !isMissionCompletedForDay(m, currentWeekday)).toList();
 
-                  if (missions.isEmpty) {
+                  final completedMissions = missions.where((m) => isMissionCompletedForDay(m, currentWeekday)).toList();
+                  final isAllCompletedOrEmpty = mainMissions.isEmpty && sideMissions.isEmpty && routines.isEmpty && currentFilter == 'All';
+
+                  if (missions.isEmpty || (isAllCompletedOrEmpty && completedMissions.isEmpty)) {
                     return RefreshIndicator(
                       onRefresh: _onRefresh,
                       color: AppColors.primary,
@@ -192,7 +198,7 @@ class HomeScreen extends ConsumerWidget {
                       ],
 
                       // 🔥 MAIN GOAL (60-70% Effort)
-                      if (mainMissions.isNotEmpty || currentFilter == 'Main' || currentFilter == 'All') ...[
+                      if (mainMissions.isNotEmpty) ...[
                         _buildSectionBanner(
                           context,
                           icon: '🔥',
@@ -205,13 +211,11 @@ class HomeScreen extends ConsumerWidget {
                           _buildMainGoalCard(context, ref, m),
                           const SizedBox(height: 14),
                         ],
-                        if (mainMissions.isEmpty)
-                          _buildEmptyGoalBox(context, 'No Main Goal set for today. Focus on high impact!'),
                         const SizedBox(height: 20),
                       ],
 
                       // ⭐ SIDE GOAL (20-30% Effort)
-                      if (sideMissions.isNotEmpty || currentFilter == 'Side' || currentFilter == 'All') ...[
+                      if (sideMissions.isNotEmpty) ...[
                         _buildSectionBanner(
                           context,
                           icon: '⭐',
@@ -224,13 +228,11 @@ class HomeScreen extends ConsumerWidget {
                           _buildSideGoalCard(context, ref, m),
                           const SizedBox(height: 12),
                         ],
-                        if (sideMissions.isEmpty)
-                          _buildEmptyGoalBox(context, 'No Side Goal set. Great for balanced progress!'),
                         const SizedBox(height: 20),
                       ],
 
                       // ✅ DAILY ROUTINE (10-20% Effort)
-                      if (routines.isNotEmpty || currentFilter == 'Routine' || currentFilter == 'All') ...[
+                      if (routines.isNotEmpty) ...[
                         _buildSectionBanner(
                           context,
                           icon: '✅',
@@ -242,10 +244,43 @@ class HomeScreen extends ConsumerWidget {
                         for (final m in routines) ...[
                           _buildRoutineTile(context, ref, m),
                         ],
-                        if (routines.isEmpty)
-                          _buildEmptyGoalBox(context, 'No routines set for consistent daily wins!'),
                         const SizedBox(height: 32),
                       ], // closes if routines
+
+                      // 🏆 ALL DONE EMPTY STATE (Shown if all active are complete but we have completed missions)
+                      if (isAllCompletedOrEmpty && completedMissions.isNotEmpty) ...[
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                        const Center(
+                          child: CharacterEmptyBox(text: 'All caught up for today!'),
+                        ),
+                        const SizedBox(height: 32),
+                      ],
+
+                      // 🏁 COMPLETED TASKS SECTION
+                      if (completedMissions.isNotEmpty) ...[
+                        Theme(
+                          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                          child: ExpansionTile(
+                            tilePadding: const EdgeInsets.symmetric(horizontal: 4),
+                            title: Text(
+                              'Completed (${completedMissions.length})',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: isDark ? AppColors.textPrimary : AppColors.lightTextPrimary,
+                              ),
+                            ),
+                            children: [
+                              const SizedBox(height: 8),
+                              for (final m in completedMissions) ...[
+                                _buildCompletedTile(context, ref, m),
+                                const SizedBox(height: 8),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                      ],
                     ], // closes children
                   ), // closes ListView
                  ), // closes ScrollVelocityTracker
@@ -277,6 +312,66 @@ class HomeScreen extends ConsumerWidget {
       return 'Good Afternoon, $name';
     } else {
       return 'Good Evening, $name';
+    }
+  }
+
+  List<Subtask> _parseSubtasks(String? description) {
+    if (description == null) return [];
+    final lines = description.split('\n');
+    final subtasks = <Subtask>[];
+    for (final line in lines) {
+      if (line.startsWith('• ')) {
+        String subtaskText = line.substring(2);
+        bool isCompleted = false;
+        if (subtaskText.startsWith('[ ] ')) {
+          subtaskText = subtaskText.substring(4);
+        } else if (subtaskText.startsWith('[x] ')) {
+          subtaskText = subtaskText.substring(4);
+          isCompleted = true;
+        }
+        subtasks.add(Subtask(subtaskText, isCompleted));
+      }
+    }
+    return subtasks;
+  }
+
+  String _toggleSubtaskInDescription(String description, int index) {
+    final lines = description.split('\n');
+    int subtaskIndex = 0;
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].startsWith('• ')) {
+        if (subtaskIndex == index) {
+          if (lines[i].contains('• [x] ')) {
+            lines[i] = lines[i].replaceFirst('• [x] ', '• [ ] ');
+          } else if (lines[i].contains('• [ ] ')) {
+            lines[i] = lines[i].replaceFirst('• [ ] ', '• [x] ');
+          } else {
+            lines[i] = lines[i].replaceFirst('• ', '• [x] ');
+          }
+          break;
+        }
+        subtaskIndex++;
+      }
+    }
+    return lines.join('\n');
+  }
+
+  Future<void> _handleSubtaskToggle(BuildContext context, WidgetRef ref, Mission mission, int index, List<Subtask> currentSubtasks) async {
+    final newDesc = _toggleSubtaskInDescription(mission.description!, index);
+    mission.description = newDesc;
+    await ref.read(missionNotifierProvider.notifier).updateMission(mission);
+
+    final updatedSubtasks = _parseSubtasks(newDesc);
+    final allDone = updatedSubtasks.every((s) => s.isCompleted);
+    final currentDayCompleted = isMissionCompletedForDay(mission, DateTime.now().weekday);
+    
+    if (allDone && !currentDayCompleted) {
+      final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+      if (event != null && context.mounted) {
+        showLevelUpCelebration(context, event.oldLevel, event.newLevel);
+      }
+    } else if (!allDone && currentDayCompleted) {
+      await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
     }
   }
 
@@ -321,9 +416,12 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildMainGoalCard(BuildContext context, WidgetRef ref, Mission mission) {
+    final bool isCompleted = isMissionCompletedForDay(mission, DateTime.now().weekday);
     return ScrollBender(
       child: SwipeableMissionCard(
+        key: ValueKey('home_main_${mission.id}'),
         mission: mission,
+        confirmDelete: () => _showDeleteConfirmation(context),
         onComplete: () async {
           final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
           if (event != null && context.mounted) {
@@ -342,11 +440,11 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(26),
-          gradient: mission.isCompleted 
+          gradient: isCompleted 
               ? const LinearGradient(colors: [AppColors.success, Color(0xFF047857)])
               : AppColors.primaryGradient,
           boxShadow: [
-            if (!mission.isCompleted)
+            if (!isCompleted)
               BoxShadow(
                 color: AppColors.primary.withOpacity(0.3),
                 blurRadius: 16,
@@ -379,7 +477,7 @@ class HomeScreen extends ConsumerWidget {
                           showLevelUpCelebration(context, event.oldLevel, event.newLevel);
                         }
                       },
-                      child: mission.isCompleted
+                      child: isCompleted
                           ? const Icon(Icons.check_circle_rounded, color: Colors.white, size: 30)
                           : const Icon(Icons.circle_outlined, color: Colors.white, size: 30),
                     ),
@@ -396,11 +494,53 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             if (mission.description != null && mission.description!.isNotEmpty) ...[
-              const SizedBox(height: 6),
-              Text(
-                mission.description!.split('\n').first,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white.withOpacity(0.85), fontSize: 13),
-              ),
+              Builder(builder: (context) {
+                final subtasks = _parseSubtasks(mission.description);
+                if (subtasks.isEmpty) {
+                  final descFirstLine = mission.description!.split('\n').first;
+                  if (descFirstLine == 'Subtasks:') return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      descFirstLine,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white.withOpacity(0.85), fontSize: 13),
+                    ),
+                  );
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8),
+                    for (int i = 0; i < subtasks.length; i++)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6, left: 8),
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () => _handleSubtaskToggle(context, ref, mission, i, subtasks),
+                              child: Icon(
+                                subtasks[i].isCompleted ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                subtasks[i].text,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 13,
+                                  decoration: subtasks[i].isCompleted ? TextDecoration.lineThrough : null,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                );
+              }),
             ]
           ],
         ),
@@ -412,9 +552,12 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _buildSideGoalCard(BuildContext context, WidgetRef ref, Mission mission) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isCompleted = isMissionCompletedForDay(mission, DateTime.now().weekday);
     return ScrollBender(
       child: SwipeableMissionCard(
+        key: ValueKey('home_side_${mission.id}'),
         mission: mission,
+        confirmDelete: () => _showDeleteConfirmation(context),
         onComplete: () async {
           final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
           if (event != null && context.mounted) {
@@ -433,7 +576,7 @@ class HomeScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: isDark ? AppColors.surface : AppColors.lightSurface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: mission.isCompleted ? AppColors.success.withOpacity(0.4) : AppColors.primary.withOpacity(0.35), width: 1.2),
+          border: Border.all(color: isCompleted ? AppColors.success.withOpacity(0.4) : AppColors.primary.withOpacity(0.35), width: 1.2),
         ),
         child: Row(
           children: [
@@ -445,8 +588,8 @@ class HomeScreen extends ConsumerWidget {
                 }
               },
               child: Icon(
-                mission.isCompleted ? Icons.check_circle_rounded : Icons.circle_outlined,
-                color: mission.isCompleted ? AppColors.success : AppColors.primary,
+                isCompleted ? Icons.check_circle_rounded : Icons.circle_outlined,
+                color: isCompleted ? AppColors.success : AppColors.primary,
                 size: 28,
               ),
             ),
@@ -458,19 +601,60 @@ class HomeScreen extends ConsumerWidget {
                   Text(
                     mission.title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      decoration: mission.isCompleted ? TextDecoration.lineThrough : null,
-                      color: mission.isCompleted ? (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary) : (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary),
+                      decoration: isCompleted ? TextDecoration.lineThrough : null,
+                      color: isCompleted ? (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary) : (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   if (mission.description != null && mission.description!.isNotEmpty) ...[
-                    const SizedBox(height: 3),
-                    Text(
-                      mission.description!.split('\n').first,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
-                    ),
+                    Builder(builder: (context) {
+                      final subtasks = _parseSubtasks(mission.description);
+                      if (subtasks.isEmpty) {
+                        final descFirstLine = mission.description!.split('\n').first;
+                        if (descFirstLine == 'Subtasks:') return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 3),
+                          child: Text(
+                            descFirstLine,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                          ),
+                        );
+                      }
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 6),
+                          for (int i = 0; i < subtasks.length; i++)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4, left: 6),
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => _handleSubtaskToggle(context, ref, mission, i, subtasks),
+                                    child: Icon(
+                                      subtasks[i].isCompleted ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
+                                      color: subtasks[i].isCompleted ? AppColors.success : AppColors.textSecondary,
+                                      size: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      subtasks[i].text,
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.textSecondary,
+                                        decoration: subtasks[i].isCompleted ? TextDecoration.lineThrough : null,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      );
+                    }),
                   ],
                 ],
               ),
@@ -496,9 +680,12 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _buildRoutineTile(BuildContext context, WidgetRef ref, Mission mission) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isCompleted = isMissionCompletedForDay(mission, DateTime.now().weekday);
     return ScrollBender(
       child: SwipeableMissionCard(
+        key: ValueKey('home_routine_${mission.id}'),
         mission: mission,
+        confirmDelete: () => _showDeleteConfirmation(context),
         onComplete: () async {
           final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
           if (event != null && context.mounted) {
@@ -530,20 +717,64 @@ class HomeScreen extends ConsumerWidget {
                     }
                   },
                   child: Icon(
-                    mission.isCompleted ? Icons.check_circle_rounded : Icons.circle_outlined,
-                    color: mission.isCompleted ? AppColors.success : AppColors.textSecondary,
+                    isCompleted ? Icons.check_circle_rounded : Icons.circle_outlined,
+                    color: isCompleted ? AppColors.success : AppColors.textSecondary,
                     size: 24,
                   ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
-                  child: Text(
-                    mission.title,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      decoration: mission.isCompleted ? TextDecoration.lineThrough : null,
-                      color: mission.isCompleted ? (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary) : (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary),
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        mission.title,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          decoration: isCompleted ? TextDecoration.lineThrough : null,
+                          color: isCompleted ? (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary) : (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      if (mission.description != null && mission.description!.isNotEmpty)
+                        Builder(builder: (context) {
+                           final subtasks = _parseSubtasks(mission.description);
+                           if (subtasks.isEmpty) return const SizedBox.shrink();
+                           return Column(
+                             crossAxisAlignment: CrossAxisAlignment.start,
+                             children: [
+                               const SizedBox(height: 4),
+                               for (int i = 0; i < subtasks.length; i++)
+                                 Padding(
+                                   padding: const EdgeInsets.only(bottom: 2, left: 6),
+                                   child: Row(
+                                     children: [
+                                       GestureDetector(
+                                         onTap: () => _handleSubtaskToggle(context, ref, mission, i, subtasks),
+                                         child: Icon(
+                                           subtasks[i].isCompleted ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
+                                           color: subtasks[i].isCompleted ? AppColors.success : AppColors.textSecondary,
+                                           size: 14,
+                                         ),
+                                       ),
+                                       const SizedBox(width: 4),
+                                       Expanded(
+                                         child: Text(
+                                           subtasks[i].text,
+                                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                             color: AppColors.textSecondary,
+                                             fontSize: 10,
+                                             decoration: subtasks[i].isCompleted ? TextDecoration.lineThrough : null,
+                                           ),
+                                         ),
+                                       ),
+                                     ],
+                                   ),
+                                 ),
+                             ],
+                           );
+                        }),
+                    ],
                   ),
                 ),
                 Text('+${mission.xpReward} XP', style: const TextStyle(color: AppColors.success, fontSize: 12, fontWeight: FontWeight.bold)),
@@ -574,5 +805,76 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildCompletedTile(BuildContext context, WidgetRef ref, Mission mission) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: (isDark ? AppColors.surfaceHighlight : AppColors.lightSurfaceHighlight).withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () async {
+              await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
+            },
+            child: const Icon(
+              Icons.check_circle_rounded,
+              color: AppColors.success,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              mission.title,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                decoration: TextDecoration.lineThrough,
+                color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
+              ),
+            ),
+          ),
+          Text(
+            '+${mission.xpReward} XP', 
+            style: TextStyle(
+              color: isDark ? AppColors.textSecondary.withOpacity(0.8) : AppColors.lightTextSecondary.withOpacity(0.8), 
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<bool> _showDeleteConfirmation(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.delete_forever_rounded, color: AppColors.error),
+            const SizedBox(width: 10),
+            Text('Delete Task?', style: Theme.of(ctx).textTheme.titleLarge),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to permanently delete this task?\nThis action cannot be undone.',
+          style: Theme.of(ctx).textTheme.bodyMedium,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    ) ?? false;
   }
 }

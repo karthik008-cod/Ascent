@@ -54,16 +54,16 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> with SingleTick
             final xpNeeded = nextLevelTotalXp - currentBaseXp;
 
             // Count missions
-            final missions = missionsAsync.valueOrNull ?? [];
-            final completedToday = missions.where((m) => m.isCompleted).length;
+            final allMissions = missionsAsync.valueOrNull ?? [];
+            final missions = allMissions.where((m) => !(m.description?.contains('[TUTORIAL_TASK]') ?? false)).toList();
+            
+            final completedTodayAsync = ref.watch(completedTodayProvider);
+            final completedToday = completedTodayAsync.valueOrNull ?? 0;
             final totalMissions = missions.length;
 
-            // Weekly activity (last 7 days)
-            final now = DateTime.now();
-            final weekActivity = List.generate(7, (i) {
-              final day = now.subtract(Duration(days: 6 - i));
-              return missions.any((m) => m.isCompleted && m.date.year == day.year && m.date.month == day.month && m.date.day == day.day);
-            });
+            // Weekly activity (last 7 days) from SharedPreferences provider
+            final weekActivityAsync = ref.watch(weeklyActivityProvider);
+            final weekActivity = weekActivityAsync.valueOrNull ?? List.filled(7, false);
 
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),

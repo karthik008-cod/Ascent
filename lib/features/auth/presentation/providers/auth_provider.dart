@@ -109,16 +109,16 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
     final currentUser = state.valueOrNull;
     if (currentUser == null || currentUser.id == 'local_user') return;
     
-    try {
-      final isar = ref.read(localIsarProvider);
-      final mongo = ref.read(mongoDataSourceProvider);
-      final missions = await isar.getAllMissions();
-      final stats = await isar.getUserStats();
-      final projects = await isar.getAllProjects();
-      await mongo.backupData(currentUser.id, missions, stats, projects);
-    } catch (e) {
-      print('Backup before switch failed: $e');
-    }
+    final isar = ref.read(localIsarProvider);
+    final mongo = ref.read(mongoDataSourceProvider);
+    final missions = await isar.getAllMissions();
+    final missionsToBackup = missions.where((m) => !(m.description?.contains('[TUTORIAL_TASK]') ?? false)).toList();
+    final stats = await isar.getUserStats();
+    final projects = await isar.getAllProjects();
+    
+    // We intentionally do NOT catch the error here. If backup fails, we MUST NOT switch accounts,
+    // otherwise the user will permanently lose their local data!
+    await mongo.backupData(currentUser.id, missionsToBackup, stats, projects);
   }
 
   // --- Restore a user's data from MongoDB into local Isar ---
@@ -126,11 +126,12 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
     final isar = ref.read(localIsarProvider);
     final mongo = ref.read(mongoDataSourceProvider);
     
-    // Clear all local data first
-    await isar.clearAllData();
-    
     try {
+      // Fetch data FIRST before wiping local DB!
       final data = await mongo.restoreData(userId);
+      
+      // If we got the data successfully, now we can safely clear the local DB
+      await isar.clearAllData();
       
       // Restore stats
       final statsDoc = data['stats'] as Map<String, dynamic>?;
@@ -158,11 +159,15 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
             ..type = MissionType.values[docMap['type'] ?? 0]
             ..xpReward = docMap['xpReward'] ?? 0
             ..isCompleted = docMap['isCompleted'] ?? false
-            ..date = DateTime.tryParse(docMap['date'] ?? '') ?? DateTime.now()
+            ..date = (DateTime.tryParse(docMap['date'] ?? '') ?? DateTime.now()).toLocal()
             ..projectId = docMap['projectId'];
           return m;
         }).toList();
         await isar.importMissions(missions);
+      } else {
+        // If they have 0 missions, ensure tutorial tasks are seeded!
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('tutorial_tasks_seeded', false);
       }
       
       // Restore projects
@@ -176,7 +181,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
             ..description = docMap['description']
             ..notes = docMap['notes']
             ..progress = (docMap['progress'] ?? 0.0).toDouble()
-            ..createdAt = DateTime.tryParse(docMap['createdAt'] ?? '') ?? DateTime.now();
+            ..createdAt = (DateTime.tryParse(docMap['createdAt'] ?? '') ?? DateTime.now()).toLocal();
           return p;
         }).toList();
         await isar.importProjects(projects);
@@ -188,18 +193,28 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
   }
 
   Future<void> switchAccount(AuthUser user) async {
+    final previousUser = state.valueOrNull;
     state = const AsyncValue.loading();
-    // 1. Backup current user's data to MongoDB
-    await _backupCurrentUser();
-    
-    // 2. Restore the new user's data from MongoDB
-    await _restoreUserData(user.id);
-    
-    // 3. Update auth state
-    state = AsyncValue.data(user);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userKey, jsonEncode(user.toMap()));
-    await _saveUserToHistory(user);
+    try {
+      // 1. Backup current user's data to MongoDB
+      await _backupCurrentUser();
+      
+      // 2. Restore the new user's data from MongoDB
+      await _restoreUserData(user.id);
+      
+      // 3. Update auth state
+      state = AsyncValue.data(user);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_userKey, jsonEncode(user.toMap()));
+      await _saveUserToHistory(user);
+    } catch (e) {
+      if (previousUser != null) {
+        state = AsyncValue.data(previousUser);
+      } else {
+        state = const AsyncValue.data(null);
+      }
+      rethrow;
+    }
   }
 
   Future<void> _checkLoginStatus() async {
@@ -208,13 +223,37 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
       final userJson = prefs.getString(_userKey);
       if (userJson != null) {
         final map = jsonDecode(userJson);
-        state = AsyncValue.data(AuthUser.fromMap(map));
+        final user = AuthUser.fromMap(map);
+        state = AsyncValue.data(user);
+        
+        // Silently verify session against backend in background
+        _verifySession(user.email);
       } else {
         // No user is logged in, require explicit auth
         state = const AsyncValue.data(null);
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> _verifySession(String email) async {
+    try {
+      if (email == 'yuvaan@ascent.app') return; // Bypass for local dev account
+      final exists = await checkUserExists(email);
+      if (!exists) {
+        // User was deleted from the backend cloud, but local session exists.
+        // Force log them out.
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_userKey);
+        
+        final isar = ref.read(localIsarProvider);
+        await isar.clearAllData();
+        
+        state = const AsyncValue.data(null);
+      }
+    } catch (e) {
+      // Ignore network errors so offline mode still works
     }
   }
 
@@ -226,6 +265,24 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
     String? motto,
   }) async {
     final current = state.value ?? AuthUser(id: 'local_user', email: 'yuvaan@ascent.app', name: 'Yuvaan');
+    
+    // Sync with backend
+    try {
+      final mongo = ref.read(mongoDataSourceProvider);
+      await mongo.updateProfile(
+        current.email,
+        name: name,
+        bio: bio,
+        role: role,
+        socialHandle: socialHandle,
+        motto: motto,
+      );
+    } catch (e) {
+      print('Failed to update profile on backend: $e');
+      // Decide if we should throw or just proceed locally. Usually we want to throw.
+      rethrow;
+    }
+
     final updatedUser = current.copyWith(
       name: name,
       bio: bio,
@@ -342,6 +399,9 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
         // Clear local data for the new user (fresh start)
         final isar = ref.read(localIsarProvider);
         await isar.clearAllData();
+        
+        // Ensure tutorial tasks will be seeded for this new account
+        await prefs.setBool('tutorial_tasks_seeded', false);
         
         state = AsyncValue.data(user);
       } else {

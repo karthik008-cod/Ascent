@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/models/user_stats.dart';
 import '../../../tasks/presentation/providers/data_providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LevelUpEvent {
   final int oldLevel;
@@ -56,8 +57,14 @@ class LevelSystem {
 }
 
 class UserStatsNotifier extends StateNotifier<AsyncValue<UserStats>> {
-  UserStatsNotifier(this.ref) : super(const AsyncValue.loading()) {
-    _loadStats();
+  UserStatsNotifier(this.ref, {bool loadImmediately = true}) : super(const AsyncValue.loading()) {
+    if (loadImmediately) {
+      _loadStats();
+    }
+  }
+
+  void setLoading() {
+    state = const AsyncValue.loading();
   }
 
   final Ref ref;
@@ -69,8 +76,83 @@ class UserStatsNotifier extends StateNotifier<AsyncValue<UserStats>> {
       final stats = await repository.getUserStats();
       stats.currentLevel = LevelSystem.calculateLevel(stats.totalXp);
       state = AsyncValue.data(stats);
+      await refreshStreakOnLaunch();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> refreshStreakOnLaunch() async {
+    final repository = ref.read(statsRepositoryProvider);
+    if (state.value != null) {
+      final stats = state.value!;
+      if (stats.lastActiveDate != null) {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final last = stats.lastActiveDate!;
+        final lastDate = DateTime(last.year, last.month, last.day);
+        
+        if (today.difference(lastDate).inDays > 1) {
+          // Missed a day, reset streak to 0
+          if (stats.currentStreak != 0) {
+            stats.currentStreak = 0;
+            await repository.saveUserStats(stats);
+            state = AsyncValue.data(stats);
+          }
+        }
+      }
+    }
+  }
+
+  Future<void> checkAndUpdateStreak() async {
+    final repository = ref.read(statsRepositoryProvider);
+    if (state.value != null) {
+      final stats = state.value!;
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      
+      if (stats.lastActiveDate != null) {
+        final last = stats.lastActiveDate!;
+        final lastDate = DateTime(last.year, last.month, last.day);
+        
+        final diff = today.difference(lastDate).inDays;
+        if (diff == 1) {
+          // Continuous day!
+          stats.currentStreak += 1;
+          if (stats.currentStreak > stats.longestStreak) {
+            stats.longestStreak = stats.currentStreak;
+          }
+          stats.lastActiveDate = now;
+        } else if (diff > 1) {
+          // Streak was broken
+          stats.currentStreak = 1;
+          stats.lastActiveDate = now;
+        } else if (diff == 0) {
+          // Already active today, just update time
+          stats.lastActiveDate = now;
+        }
+      } else {
+        // First time ever active
+        stats.currentStreak = 1;
+        if (stats.currentStreak > stats.longestStreak) {
+          stats.longestStreak = stats.currentStreak;
+        }
+        stats.lastActiveDate = now;
+      }
+      
+      // Update SharedPreferences for weekly activity history
+      final prefs = await SharedPreferences.getInstance();
+      final activeDates = prefs.getStringList('active_dates') ?? [];
+      final dateStr = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+      if (!activeDates.contains(dateStr)) {
+        activeDates.add(dateStr);
+        if (activeDates.length > 30) activeDates.removeAt(0);
+        await prefs.setStringList('active_dates', activeDates);
+        ref.invalidate(weeklyActivityProvider);
+      }
+      
+      await repository.saveUserStats(stats);
+      state = AsyncValue.data(stats);
     }
   }
 
@@ -104,9 +186,67 @@ class UserStatsNotifier extends StateNotifier<AsyncValue<UserStats>> {
       state = AsyncValue.data(stats);
     }
   }
+
+  Future<void> incrementCompletedToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+    final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    
+    final storedDate = prefs.getString('completed_today_date') ?? '';
+    if (storedDate != dateStr) {
+      await prefs.setInt('completed_today_count', 1);
+      await prefs.setString('completed_today_date', dateStr);
+    } else {
+      final current = prefs.getInt('completed_today_count') ?? 0;
+      await prefs.setInt('completed_today_count', current + 1);
+    }
+    ref.invalidate(completedTodayProvider);
+  }
+
+  Future<void> decrementCompletedToday() async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+    final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    
+    final storedDate = prefs.getString('completed_today_date') ?? '';
+    if (storedDate == dateStr) {
+      final current = prefs.getInt('completed_today_count') ?? 0;
+      if (current > 0) {
+        await prefs.setInt('completed_today_count', current - 1);
+        ref.invalidate(completedTodayProvider);
+      }
+    }
+  }
 }
 
 final userStatsNotifierProvider = StateNotifierProvider<UserStatsNotifier, AsyncValue<UserStats>>((ref) {
-  ref.watch(authNotifierProvider);
-  return UserStatsNotifier(ref);
+  final authState = ref.watch(authNotifierProvider);
+  if (authState.isLoading) {
+    return UserStatsNotifier(ref, loadImmediately: false)..setLoading();
+  }
+  return UserStatsNotifier(ref, loadImmediately: true);
+});
+
+final completedTodayProvider = FutureProvider<int>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  final now = DateTime.now();
+  final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  
+  final storedDate = prefs.getString('completed_today_date') ?? '';
+  if (storedDate != dateStr) {
+    return 0; // Reset for a new day
+  }
+  return prefs.getInt('completed_today_count') ?? 0;
+});
+
+final weeklyActivityProvider = FutureProvider<List<bool>>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  final activeDates = prefs.getStringList('active_dates') ?? [];
+  final now = DateTime.now();
+  
+  return List.generate(7, (i) {
+    final day = now.subtract(Duration(days: 6 - i));
+    final dateStr = '${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}';
+    return activeDates.contains(dateStr);
+  });
 });

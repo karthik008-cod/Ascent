@@ -237,7 +237,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           final stats = ref.read(userStatsNotifierProvider).value;
                           if (stats != null && user != null) {
                             final mongo = ref.read(mongoDataSourceProvider);
-                            await mongo.backupData(user.id, missions, stats);
+                            final missionsToBackup = missions.where((m) => !(m.description?.contains('[TUTORIAL_TASK]') ?? false)).toList();
+                            await mongo.backupData(user.id, missionsToBackup, stats);
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Successfully synced all data to cloud!')),
@@ -534,10 +535,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               ],
                             ),
                             subtitle: Text(user.email, style: TextStyle(color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary)),
-                            onTap: isCurrent ? null : () {
-                              Navigator.pop(ctx); // pop sheet
-                              Navigator.pop(context); // pop settings
-                              authNotifier.switchAccount(user);
+                            onTap: isCurrent ? null : () async {
+                              Navigator.pop(ctx);
+                              try {
+                                await authNotifier.switchAccount(user);
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Failed to switch account: $e')),
+                                  );
+                                }
+                              }
                             },
                           );
                         }),

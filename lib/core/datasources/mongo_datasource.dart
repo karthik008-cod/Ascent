@@ -73,6 +73,24 @@ class MongoDataSource {
     }
   }
 
+  Future<void> updateProfile(String email, {String? name, String? bio, String? role, String? socialHandle, String? motto}) async {
+    final body = <String, dynamic>{'email': email};
+    if (name != null) body['name'] = name;
+    if (bio != null) body['bio'] = bio;
+    if (role != null) body['role'] = role;
+    if (socialHandle != null) body['socialHandle'] = socialHandle;
+    if (motto != null) body['motto'] = motto;
+
+    final response = await http.put(
+      Uri.parse('$_baseUrl/auth/profile'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(body),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update profile');
+    }
+  }
+
   Future<void> deleteUser(String email) async {
     final response = await http.delete(
       Uri.parse('$_baseUrl/auth/$email'),

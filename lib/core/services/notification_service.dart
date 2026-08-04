@@ -72,22 +72,20 @@ class NotificationService {
     required int id,
     required String title,
     required String body,
-    required TimeOfDay scheduledTime,
+    required DateTime scheduledDateTime,
     String repeatMode = 'Once',
   }) async {
     await init();
 
-    final now = DateTime.now();
-    var scheduledDate = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      scheduledTime.hour,
-      scheduledTime.minute,
-    );
+    // If the scheduled time is in the past and it's a one-time notification, skip
+    if (scheduledDateTime.isBefore(DateTime.now()) && repeatMode == 'Once') {
+      return;
+    }
 
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    // For repeating notifications where the time today has passed, push to tomorrow
+    var effectiveDateTime = scheduledDateTime;
+    if (effectiveDateTime.isBefore(DateTime.now())) {
+      effectiveDateTime = effectiveDateTime.add(const Duration(days: 1));
     }
 
     DateTimeComponents? matchComponents;
@@ -114,7 +112,7 @@ class NotificationService {
         id,
         title,
         body,
-        tz.TZDateTime.from(scheduledDate, tz.local),
+        tz.TZDateTime.from(effectiveDateTime, tz.local),
         platformDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
@@ -126,7 +124,7 @@ class NotificationService {
         id,
         title,
         body,
-        tz.TZDateTime.from(scheduledDate, tz.local),
+        tz.TZDateTime.from(effectiveDateTime, tz.local),
         platformDetails,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
@@ -136,10 +134,20 @@ class NotificationService {
   }
 
   static Future<void> cancelNotification(int id) async {
-    await _notificationsPlugin.cancel(id);
+    try {
+      await init();
+      await _notificationsPlugin.cancel(id);
+    } catch (e) {
+      debugPrint('Error canceling notification: $e');
+    }
   }
 
   static Future<void> cancelAllNotifications() async {
-    await _notificationsPlugin.cancelAll();
+    try {
+      await init();
+      await _notificationsPlugin.cancelAll();
+    } catch (e) {
+      debugPrint('Error canceling all notifications: $e');
+    }
   }
 }

@@ -41,7 +41,8 @@ class SyncService {
 
     try {
       final mongo = ref.read(mongoDataSourceProvider);
-      await mongo.backupData(user.id, missions, stats, projects);
+      final missionsToBackup = missions.where((m) => !(m.description?.contains('[TUTORIAL_TASK]') ?? false)).toList();
+      await mongo.backupData(user.id, missionsToBackup, stats, projects);
       print('Background sync completed successfully.');
     } catch (e) {
       print('Background sync failed: $e');

@@ -467,10 +467,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           maxLength: 6,
           textAlign: TextAlign.center,
           style: const TextStyle(letterSpacing: 8, fontSize: 24, fontWeight: FontWeight.bold),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             counterText: '',
             hintText: '000000',
-            contentPadding: EdgeInsets.symmetric(vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.content_paste),
+              tooltip: 'Paste OTP',
+              onPressed: () async {
+                final data = await Clipboard.getData(Clipboard.kTextPlain);
+                if (data != null && data.text != null) {
+                  final pastedText = data.text!.replaceAll(RegExp(r'[^0-9]'), '');
+                  if (pastedText.isNotEmpty) {
+                    _otpController.text = pastedText.substring(0, pastedText.length > 6 ? 6 : pastedText.length);
+                  }
+                }
+              },
+            ),
           ),
         ),
         const SizedBox(height: 32),
@@ -500,10 +513,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           maxLength: 6,
           textAlign: TextAlign.center,
           style: const TextStyle(letterSpacing: 8, fontSize: 24, fontWeight: FontWeight.bold),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             counterText: '',
             hintText: '000000',
-            contentPadding: EdgeInsets.symmetric(vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.content_paste),
+              tooltip: 'Paste OTP',
+              onPressed: () async {
+                final data = await Clipboard.getData(Clipboard.kTextPlain);
+                if (data != null && data.text != null) {
+                  final pastedText = data.text!.replaceAll(RegExp(r'[^0-9]'), '');
+                  if (pastedText.isNotEmpty) {
+                    _otpController.text = pastedText.substring(0, pastedText.length > 6 ? 6 : pastedText.length);
+                  }
+                }
+              },
+            ),
           ),
         ),
         const SizedBox(height: 32),
