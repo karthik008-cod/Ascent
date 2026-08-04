@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../tasks/presentation/providers/missions_provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class MainScaffold extends ConsumerWidget {
   const MainScaffold({super.key, required this.navigationShell});
@@ -13,8 +14,9 @@ class MainScaffold extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return _ReminderWrapper(
-      child: Scaffold(
+    return _NetworkBannerWrapper(
+      child: _ReminderWrapper(
+        child: Scaffold(
         body: navigationShell,
         bottomNavigationBar: NavigationBar(
           selectedIndex: navigationShell.currentIndex,
@@ -205,5 +207,119 @@ class _ReminderWrapperState extends ConsumerState<_ReminderWrapper> {
   @override
   Widget build(BuildContext context) {
     return widget.child;
+  }
+}
+
+class _NetworkBannerWrapper extends StatefulWidget {
+  final Widget child;
+  const _NetworkBannerWrapper({required this.child});
+
+  @override
+  State<_NetworkBannerWrapper> createState() => _NetworkBannerWrapperState();
+}
+
+class _NetworkBannerWrapperState extends State<_NetworkBannerWrapper> {
+  late StreamSubscription<List<ConnectivityResult>> _subscription;
+  bool _isOffline = false;
+  bool _showOnlineSuccess = false;
+  bool _bannerDismissed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = Connectivity().onConnectivityChanged.listen((results) {
+      final isNowOffline = results.contains(ConnectivityResult.none) || results.isEmpty;
+      if (isNowOffline && !_isOffline) {
+        // Just went offline
+        setState(() {
+          _isOffline = true;
+          _showOnlineSuccess = false;
+          _bannerDismissed = false;
+        });
+      } else if (!isNowOffline && _isOffline) {
+        // Just came back online
+        setState(() {
+          _isOffline = false;
+          _showOnlineSuccess = true;
+        });
+        // Hide success banner after 3 seconds
+        Future.delayed(const Duration(seconds: 3), () {
+          if (mounted) {
+            setState(() {
+              _showOnlineSuccess = false;
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool showOfflineBanner = _isOffline && !_bannerDismissed;
+    final bool showBanner = showOfflineBanner || _showOnlineSuccess;
+
+    return Stack(
+      children: [
+        widget.child,
+        
+        // Floating Banner
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOutBack,
+          top: showBanner ? MediaQuery.of(context).padding.top + 10 : -100,
+          left: 20,
+          right: 20,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: showOfflineBanner ? Colors.red.shade600 : Colors.green.shade600,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4)),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    showOfflineBanner ? Icons.wifi_off_rounded : Icons.cloud_done_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      showOfflineBanner 
+                          ? 'You are offline. Updates will be synced when you are back online.'
+                          : 'BACK ONLINE. All your updates have been committed.',
+                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  if (showOfflineBanner) ...[
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _bannerDismissed = true;
+                        });
+                      },
+                      child: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
+                    ),
+                  ]
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
