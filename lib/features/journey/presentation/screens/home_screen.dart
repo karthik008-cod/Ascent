@@ -17,6 +17,7 @@ import '../../../../core/widgets/scroll_bender.dart';
 import '../../../../core/widgets/swipeable_mission_card.dart';
 import '../../../progress/presentation/providers/user_stats_provider.dart';
 import '../../../tasks/presentation/providers/projects_provider.dart';
+import '../../../tasks/presentation/widgets/subtask_list.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -315,63 +316,6 @@ class HomeScreen extends ConsumerWidget {
     }
   }
 
-  List<Subtask> _parseSubtasks(String? description) {
-    if (description == null) return [];
-    final lines = description.split('\n');
-    final subtasks = <Subtask>[];
-    for (final line in lines) {
-      if (line.startsWith('• ')) {
-        String subtaskText = line.substring(2);
-        bool isCompleted = false;
-        if (subtaskText.startsWith('[ ] ')) {
-          subtaskText = subtaskText.substring(4);
-        } else if (subtaskText.startsWith('[x] ')) {
-          subtaskText = subtaskText.substring(4);
-          isCompleted = true;
-        }
-        subtasks.add(Subtask(subtaskText, isCompleted));
-      }
-    }
-    return subtasks;
-  }
-
-  String _toggleSubtaskInDescription(String description, int index) {
-    final lines = description.split('\n');
-    int subtaskIndex = 0;
-    for (int i = 0; i < lines.length; i++) {
-      if (lines[i].startsWith('• ')) {
-        if (subtaskIndex == index) {
-          if (lines[i].contains('• [x] ')) {
-            lines[i] = lines[i].replaceFirst('• [x] ', '• [ ] ');
-          } else if (lines[i].contains('• [ ] ')) {
-            lines[i] = lines[i].replaceFirst('• [ ] ', '• [x] ');
-          } else {
-            lines[i] = lines[i].replaceFirst('• ', '• [x] ');
-          }
-          break;
-        }
-        subtaskIndex++;
-      }
-    }
-    return lines.join('\n');
-  }
-
-  Future<void> _handleSubtaskToggle(BuildContext context, WidgetRef ref, Mission mission, int index, List<Subtask> currentSubtasks) async {
-    final newDesc = _toggleSubtaskInDescription(mission.description!, index);
-    mission.description = newDesc;
-    await ref.read(missionNotifierProvider.notifier).updateMission(mission);
-
-    final updatedSubtasks = _parseSubtasks(newDesc);
-    final allDone = updatedSubtasks.every((s) => s.isCompleted);
-    final currentDayCompleted = isMissionCompletedForDay(mission, DateTime.now().weekday);
-    
-    if (allDone && !currentDayCompleted) {
-      final event = await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
-      if (event != null && context.mounted) {
-        showLevelUpCelebration(context, event.oldLevel, event.newLevel);
-      }
-    } else if (!allDone && currentDayCompleted) {
-      await ref.read(missionNotifierProvider.notifier).toggleMissionStatus(mission);
     }
   }
 
@@ -494,53 +438,7 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             if (mission.description != null && mission.description!.isNotEmpty) ...[
-              Builder(builder: (context) {
-                final subtasks = _parseSubtasks(mission.description);
-                if (subtasks.isEmpty) {
-                  final descFirstLine = mission.description!.split('\n').first;
-                  if (descFirstLine == 'Subtasks:') return const SizedBox.shrink();
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text(
-                      descFirstLine,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white.withOpacity(0.85), fontSize: 13),
-                    ),
-                  );
-                }
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    for (int i = 0; i < subtasks.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6, left: 8),
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () => _handleSubtaskToggle(context, ref, mission, i, subtasks),
-                              child: Icon(
-                                subtasks[i].isCompleted ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                subtasks[i].text,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
-                                  fontSize: 13,
-                                  decoration: subtasks[i].isCompleted ? TextDecoration.lineThrough : null,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                );
-              }),
+              SubtaskList(mission: mission, isWhiteText: true),
             ]
           ],
         ),
@@ -607,54 +505,7 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                   if (mission.description != null && mission.description!.isNotEmpty) ...[
-                    Builder(builder: (context) {
-                      final subtasks = _parseSubtasks(mission.description);
-                      if (subtasks.isEmpty) {
-                        final descFirstLine = mission.description!.split('\n').first;
-                        if (descFirstLine == 'Subtasks:') return const SizedBox.shrink();
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 3),
-                          child: Text(
-                            descFirstLine,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
-                          ),
-                        );
-                      }
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 6),
-                          for (int i = 0; i < subtasks.length; i++)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 4, left: 6),
-                              child: Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () => _handleSubtaskToggle(context, ref, mission, i, subtasks),
-                                    child: Icon(
-                                      subtasks[i].isCompleted ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
-                                      color: subtasks[i].isCompleted ? AppColors.success : AppColors.textSecondary,
-                                      size: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Expanded(
-                                    child: Text(
-                                      subtasks[i].text,
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: AppColors.textSecondary,
-                                        decoration: subtasks[i].isCompleted ? TextDecoration.lineThrough : null,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      );
-                    }),
+                    SubtaskList(mission: mission, isWhiteText: false),
                   ],
                 ],
               ),
@@ -737,43 +588,7 @@ class HomeScreen extends ConsumerWidget {
                         ),
                       ),
                       if (mission.description != null && mission.description!.isNotEmpty)
-                        Builder(builder: (context) {
-                           final subtasks = _parseSubtasks(mission.description);
-                           if (subtasks.isEmpty) return const SizedBox.shrink();
-                           return Column(
-                             crossAxisAlignment: CrossAxisAlignment.start,
-                             children: [
-                               const SizedBox(height: 4),
-                               for (int i = 0; i < subtasks.length; i++)
-                                 Padding(
-                                   padding: const EdgeInsets.only(bottom: 2, left: 6),
-                                   child: Row(
-                                     children: [
-                                       GestureDetector(
-                                         onTap: () => _handleSubtaskToggle(context, ref, mission, i, subtasks),
-                                         child: Icon(
-                                           subtasks[i].isCompleted ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
-                                           color: subtasks[i].isCompleted ? AppColors.success : AppColors.textSecondary,
-                                           size: 14,
-                                         ),
-                                       ),
-                                       const SizedBox(width: 4),
-                                       Expanded(
-                                         child: Text(
-                                           subtasks[i].text,
-                                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                             color: AppColors.textSecondary,
-                                             fontSize: 10,
-                                             decoration: subtasks[i].isCompleted ? TextDecoration.lineThrough : null,
-                                           ),
-                                         ),
-                                       ),
-                                     ],
-                                   ),
-                                 ),
-                             ],
-                           );
-                        }),
+                        SubtaskList(mission: mission, isWhiteText: false),
                     ],
                   ),
                 ),

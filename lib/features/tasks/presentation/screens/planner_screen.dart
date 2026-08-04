@@ -15,6 +15,7 @@ import '../../../../core/widgets/climbing_dots_loader.dart';
 import '../../../../core/widgets/character_empty_box.dart';
 import '../../../../core/widgets/scroll_bender.dart';
 import '../../../../core/widgets/swipeable_mission_card.dart';
+import '../widgets/subtask_list.dart';
 
 class PlannerScreen extends ConsumerWidget {
   const PlannerScreen({super.key});
@@ -388,9 +389,10 @@ class PlannerScreen extends ConsumerWidget {
                               _extractReminder(mission.description!),
                               style: TextStyle(fontSize: 12, color: AppColors.primary.withOpacity(0.9)),
                             ),
-                          ]
                         ],
                       ),
+                      if (mission.description != null && mission.description!.isNotEmpty && _parseSubtasks(mission.description).isNotEmpty)
+                        SubtaskList(mission: mission, isWhiteText: false),
                     ],
                   ),
                 ),
@@ -425,6 +427,26 @@ class PlannerScreen extends ConsumerWidget {
       }
     }
     return '';
+  }
+
+  List<Subtask> _parseSubtasks(String? description) {
+    if (description == null) return [];
+    final lines = description.split('\n');
+    final subtasks = <Subtask>[];
+    for (final line in lines) {
+      if (line.startsWith('• ')) {
+        String subtaskText = line.substring(2);
+        bool isCompleted = false;
+        if (subtaskText.startsWith('[ ] ')) {
+          subtaskText = subtaskText.substring(4);
+        } else if (subtaskText.startsWith('[x] ')) {
+          subtaskText = subtaskText.substring(4);
+          isCompleted = true;
+        }
+        subtasks.add(Subtask(subtaskText, isCompleted));
+      }
+    }
+    return subtasks;
   }
 
   String _getRepeatMode(Mission m) {
