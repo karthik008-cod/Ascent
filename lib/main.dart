@@ -9,6 +9,7 @@ import './core/services/sync_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.init();
+  await NotificationService.cancelAllNotifications();
   runApp(const ProviderScope(child: AscentApp()));
 }
 
