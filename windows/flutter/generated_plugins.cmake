@@ -7,6 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_app_check
   firebase_auth
   firebase_core
+  flutter_timezone
   isar_flutter_libs
   permission_handler_windows
 )
