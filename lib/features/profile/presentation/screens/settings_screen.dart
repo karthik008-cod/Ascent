@@ -221,40 +221,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Backup to Cloud
-                    _buildSettingsItem(
-                      icon: Icons.cloud_sync_rounded,
-                      label: 'Backup to Cloud',
-                      subtitle: 'Sync missions, XP & projects',
-                      color: AppColors.primary,
-                      isDark: isCurrentlyDark,
-                      onTap: () async {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Starting backup to MongoDB...')),
-                        );
-                        try {
-                          final missions = ref.read(missionNotifierProvider).value ?? [];
-                          final stats = ref.read(userStatsNotifierProvider).value;
-                          if (stats != null && user != null) {
-                            final mongo = ref.read(mongoDataSourceProvider);
-                            final missionsToBackup = missions.where((m) => !(m.description?.contains('[TUTORIAL_TASK]') ?? false)).toList();
-                            await mongo.backupData(user.id, missionsToBackup, stats);
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Successfully synced all data to cloud!')),
-                              );
-                            }
-                          }
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Backup Status: Saved locally ($e)')),
-                            );
-                          }
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 12),
+
 
                     // Switch Account
                     _buildSettingsItem(
