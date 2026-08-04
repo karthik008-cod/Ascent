@@ -17,20 +17,21 @@ class MainScaffold extends ConsumerWidget {
     return _NetworkBannerWrapper(
       child: _ReminderWrapper(
         child: Scaffold(
-        body: navigationShell,
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: navigationShell.currentIndex,
-          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-          onDestinationSelected: (int idx) => navigationShell.goBranch(
-            idx,
-            initialLocation: idx == navigationShell.currentIndex,
+          body: navigationShell,
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: navigationShell.currentIndex,
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            onDestinationSelected: (int idx) => navigationShell.goBranch(
+              idx,
+              initialLocation: idx == navigationShell.currentIndex,
+            ),
+            destinations: const [
+              NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Today'),
+              NavigationDestination(icon: Icon(Icons.calendar_view_week_rounded), label: 'Planner'),
+              NavigationDestination(icon: Icon(Icons.show_chart_rounded), label: 'Progress'),
+              NavigationDestination(icon: Icon(Icons.person_rounded), label: 'Profile'),
+            ],
           ),
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Today'),
-            NavigationDestination(icon: Icon(Icons.calendar_view_week_rounded), label: 'Planner'),
-            NavigationDestination(icon: Icon(Icons.show_chart_rounded), label: 'Progress'),
-            NavigationDestination(icon: Icon(Icons.person_rounded), label: 'Profile'),
-          ],
         ),
       ),
     );
