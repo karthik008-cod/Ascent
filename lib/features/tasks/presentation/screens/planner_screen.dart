@@ -389,9 +389,10 @@ class PlannerScreen extends ConsumerWidget {
                               _extractReminder(mission.description!),
                               style: TextStyle(fontSize: 12, color: AppColors.primary.withOpacity(0.9)),
                             ),
+                            ],
                         ],
                       ),
-                      if (mission.description != null && mission.description!.isNotEmpty && _parseSubtasks(mission.description).isNotEmpty)
+                      if (mission.description != null && mission.description!.contains('• '))
                         SubtaskList(mission: mission, isWhiteText: false),
                     ],
                   ),
@@ -427,26 +428,6 @@ class PlannerScreen extends ConsumerWidget {
       }
     }
     return '';
-  }
-
-  List<Subtask> _parseSubtasks(String? description) {
-    if (description == null) return [];
-    final lines = description.split('\n');
-    final subtasks = <Subtask>[];
-    for (final line in lines) {
-      if (line.startsWith('• ')) {
-        String subtaskText = line.substring(2);
-        bool isCompleted = false;
-        if (subtaskText.startsWith('[ ] ')) {
-          subtaskText = subtaskText.substring(4);
-        } else if (subtaskText.startsWith('[x] ')) {
-          subtaskText = subtaskText.substring(4);
-          isCompleted = true;
-        }
-        subtasks.add(Subtask(subtaskText, isCompleted));
-      }
-    }
-    return subtasks;
   }
 
   String _getRepeatMode(Mission m) {

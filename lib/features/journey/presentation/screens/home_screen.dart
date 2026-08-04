@@ -316,9 +316,6 @@ class HomeScreen extends ConsumerWidget {
     }
   }
 
-    }
-  }
-
 
   Widget _buildSectionBanner(BuildContext context, {required String icon, required String title, required String subtitle, required Color color}) {
     return Container(
