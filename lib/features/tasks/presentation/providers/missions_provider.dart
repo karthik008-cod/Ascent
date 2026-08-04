@@ -52,12 +52,8 @@ class MissionNotifier extends StateNotifier<AsyncValue<List<Mission>>> {
         bool isOnce = m.description == null || (!m.description!.contains('Repeats: Daily') && !m.description!.contains('Repeats: Weekly'));
         
         if (m.isCompleted && isOnce) {
-          final taskDate = DateTime(m.date.year, m.date.month, m.date.day);
-          if (taskDate.isBefore(today)) {
-            await repository.deleteMission(m.id);
-            changed = true;
-            continue; // Skip adding to activeMissions
-          }
+          // Do nothing, we no longer delete completed Once tasks overnight.
+          // They are simply filtered out of the Planner view.
         } else if (!isOnce) {
           // Reset Daily or Weekly tasks!
           if (m.description!.contains('Repeats: Daily')) {
@@ -74,11 +70,6 @@ class MissionNotifier extends StateNotifier<AsyncValue<List<Mission>>> {
                    changed = true;
                 }
               }
-            } else if (m.isCompleted || (m.description?.contains('• [x] ') ?? false)) {
-               m.isCompleted = false;
-               m.description = m.description?.replaceAll('• [x] ', '• [ ] ');
-               await repository.saveMission(m);
-               changed = true;
             }
           } else if (m.description!.contains('Repeats: Weekly')) {
             final lastCompletedWeekMatch = RegExp(r'\[LastCompletedWeek:\s*([\d-]+)\]').firstMatch(m.description!);
@@ -95,12 +86,6 @@ class MissionNotifier extends StateNotifier<AsyncValue<List<Mission>>> {
                    changed = true;
                 }
               }
-            } else if (m.isCompleted || m.description!.contains('[CompletedDays:') || m.description!.contains('• [x] ')) {
-               m.isCompleted = false;
-               m.description = m.description!.replaceAll(RegExp(r'\n*\[CompletedDays:\s*[0-9,\s]+\]'), '');
-               m.description = m.description!.replaceAll('• [x] ', '• [ ] ');
-               await repository.saveMission(m);
-               changed = true;
             }
           }
         }
