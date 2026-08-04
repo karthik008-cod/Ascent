@@ -281,6 +281,7 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
             _reminderTime!.hour, _reminderTime!.minute,
           ),
           repeatMode: actualRepeatMode,
+          weeklyDays: _selectedDays.toList(),
         );
       } else {
         NotificationService.cancelNotification(mission.id);
@@ -305,6 +306,7 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
             _reminderTime!.hour, _reminderTime!.minute,
           ),
           repeatMode: actualRepeatMode,
+          weeklyDays: _selectedDays.toList(),
         );
       }
     }

@@ -77,6 +77,7 @@ class NotificationService {
     required String body,
     required DateTime scheduledDateTime,
     String repeatMode = 'Once',
+    List<int>? weeklyDays,
   }) async {
     await init();
 
@@ -92,9 +93,7 @@ class NotificationService {
     }
 
     DateTimeComponents? matchComponents;
-    if (repeatMode == 'Daily' || repeatMode == 'Hourly (Nag)') {
-      matchComponents = DateTimeComponents.time;
-    } else if (repeatMode == 'Weekly') {
+    if (repeatMode == 'Weekly') {
       matchComponents = DateTimeComponents.dayOfWeekAndTime;
     }
 
@@ -111,28 +110,66 @@ class NotificationService {
     const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
 
     try {
-      await _notificationsPlugin.zonedSchedule(
-        id,
-        title,
-        body,
-        tz.TZDateTime.from(effectiveDateTime, tz.local),
-        platformDetails,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: matchComponents,
-      );
+      if (repeatMode == 'Weekly' && weeklyDays != null && weeklyDays.isNotEmpty) {
+        // Schedule a separate notification for each selected day of the week
+        for (final day in weeklyDays) {
+          // Calculate the next occurrence of this day of the week
+          var nextDay = scheduledDateTime;
+          while (nextDay.weekday != day) {
+            nextDay = nextDay.add(const Duration(days: 1));
+          }
+          if (nextDay.isBefore(DateTime.now())) {
+            nextDay = nextDay.add(const Duration(days: 7));
+          }
+          final notificationId = id + (day * 100000); // Unique ID for each day
+          
+          await _notificationsPlugin.zonedSchedule(
+            notificationId,
+            title,
+            body,
+            tz.TZDateTime.from(nextDay, tz.local),
+            platformDetails,
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+            matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+          );
+        }
+      } else if (repeatMode == 'Daily' || repeatMode == 'Hourly (Nag)') {
+        // Schedule exact alarms for the next 7 days instead of relying on DateTimeComponents.time,
+        // because the plugin ignores future start dates for time-based components.
+        for (int i = 0; i < 7; i++) {
+          var nextDay = scheduledDateTime.add(Duration(days: i));
+          if (nextDay.isBefore(DateTime.now())) {
+            nextDay = nextDay.add(const Duration(days: 1));
+          }
+          final notificationId = id + (i * 100000); // Unique ID for each day offset
+          
+          await _notificationsPlugin.zonedSchedule(
+            notificationId,
+            title,
+            body,
+            tz.TZDateTime.from(nextDay, tz.local),
+            platformDetails,
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+            matchDateTimeComponents: null,
+          );
+        }
+      } else {
+        // Single schedule for Once
+        await _notificationsPlugin.zonedSchedule(
+          id,
+          title,
+          body,
+          tz.TZDateTime.from(effectiveDateTime, tz.local),
+          platformDetails,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+          matchDateTimeComponents: null,
+        );
+      }
     } catch (e) {
-      // Fallback to inexact if exact alarm permission is not granted yet
-      await _notificationsPlugin.zonedSchedule(
-        id,
-        title,
-        body,
-        tz.TZDateTime.from(effectiveDateTime, tz.local),
-        platformDetails,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: matchComponents,
-      );
+      debugPrint('Error scheduling notification: $e');
     }
   }
 
@@ -140,6 +177,10 @@ class NotificationService {
     try {
       await init();
       await _notificationsPlugin.cancel(id);
+      // Also cancel any potential weekly variants
+      for (int i = 1; i <= 7; i++) {
+        await _notificationsPlugin.cancel(id + (i * 100000));
+      }
     } catch (e) {
       debugPrint('Error canceling notification: $e');
     }
