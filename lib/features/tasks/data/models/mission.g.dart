@@ -13,9 +13,9 @@ extension GetMissionCollection on Isar {
   IsarCollection<Mission> get missions => this.collection();
 }
 
-final MissionSchema = CollectionSchema(
+const MissionSchema = CollectionSchema(
   name: r'Mission',
-  id: identical(0, 0.0) ? -35428383 : BigInt.parse('-3542838313713095933').toInt(),
+  id: -3542838313713095933,
   properties: {
     r'date': PropertySchema(
       id: 0,
@@ -37,19 +37,34 @@ final MissionSchema = CollectionSchema(
       name: r'projectId',
       type: IsarType.long,
     ),
-    r'title': PropertySchema(
+    r'reminderRepeatMode': PropertySchema(
       id: 4,
+      name: r'reminderRepeatMode',
+      type: IsarType.string,
+    ),
+    r'reminderTime': PropertySchema(
+      id: 5,
+      name: r'reminderTime',
+      type: IsarType.string,
+    ),
+    r'reminderWeeklyDays': PropertySchema(
+      id: 6,
+      name: r'reminderWeeklyDays',
+      type: IsarType.longList,
+    ),
+    r'title': PropertySchema(
+      id: 7,
       name: r'title',
       type: IsarType.string,
     ),
     r'type': PropertySchema(
-      id: 5,
+      id: 8,
       name: r'type',
       type: IsarType.byte,
       enumMap: _MissiontypeEnumValueMap,
     ),
     r'xpReward': PropertySchema(
-      id: 6,
+      id: 9,
       name: r'xpReward',
       type: IsarType.long,
     )
@@ -80,6 +95,24 @@ int _missionEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  {
+    final value = object.reminderRepeatMode;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.reminderTime;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.reminderWeeklyDays;
+    if (value != null) {
+      bytesCount += 3 + value.length * 8;
+    }
+  }
   bytesCount += 3 + object.title.length * 3;
   return bytesCount;
 }
@@ -94,9 +127,12 @@ void _missionSerialize(
   writer.writeString(offsets[1], object.description);
   writer.writeBool(offsets[2], object.isCompleted);
   writer.writeLong(offsets[3], object.projectId);
-  writer.writeString(offsets[4], object.title);
-  writer.writeByte(offsets[5], object.type.index);
-  writer.writeLong(offsets[6], object.xpReward);
+  writer.writeString(offsets[4], object.reminderRepeatMode);
+  writer.writeString(offsets[5], object.reminderTime);
+  writer.writeLongList(offsets[6], object.reminderWeeklyDays);
+  writer.writeString(offsets[7], object.title);
+  writer.writeByte(offsets[8], object.type.index);
+  writer.writeLong(offsets[9], object.xpReward);
 }
 
 Mission _missionDeserialize(
@@ -111,10 +147,13 @@ Mission _missionDeserialize(
   object.id = id;
   object.isCompleted = reader.readBool(offsets[2]);
   object.projectId = reader.readLongOrNull(offsets[3]);
-  object.title = reader.readString(offsets[4]);
-  object.type = _MissiontypeValueEnumMap[reader.readByteOrNull(offsets[5])] ??
+  object.reminderRepeatMode = reader.readStringOrNull(offsets[4]);
+  object.reminderTime = reader.readStringOrNull(offsets[5]);
+  object.reminderWeeklyDays = reader.readLongList(offsets[6]);
+  object.title = reader.readString(offsets[7]);
+  object.type = _MissiontypeValueEnumMap[reader.readByteOrNull(offsets[8])] ??
       MissionType.main;
-  object.xpReward = reader.readLong(offsets[6]);
+  object.xpReward = reader.readLong(offsets[9]);
   return object;
 }
 
@@ -134,11 +173,17 @@ P _missionDeserializeProp<P>(
     case 3:
       return (reader.readLongOrNull(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
+      return (reader.readStringOrNull(offset)) as P;
+    case 6:
+      return (reader.readLongList(offset)) as P;
+    case 7:
+      return (reader.readString(offset)) as P;
+    case 8:
       return (_MissiontypeValueEnumMap[reader.readByteOrNull(offset)] ??
           MissionType.main) as P;
-    case 6:
+    case 9:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -576,6 +621,471 @@ extension MissionQueryFilter
     });
   }
 
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'reminderRepeatMode',
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'reminderRepeatMode',
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'reminderRepeatMode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'reminderRepeatMode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'reminderRepeatMode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'reminderRepeatMode',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'reminderRepeatMode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'reminderRepeatMode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'reminderRepeatMode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'reminderRepeatMode',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'reminderRepeatMode',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderRepeatModeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'reminderRepeatMode',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition> reminderTimeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'reminderTime',
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderTimeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'reminderTime',
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition> reminderTimeEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'reminderTime',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition> reminderTimeGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'reminderTime',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition> reminderTimeLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'reminderTime',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition> reminderTimeBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'reminderTime',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition> reminderTimeStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'reminderTime',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition> reminderTimeEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'reminderTime',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition> reminderTimeContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'reminderTime',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition> reminderTimeMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'reminderTime',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition> reminderTimeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'reminderTime',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderTimeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'reminderTime',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'reminderWeeklyDays',
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'reminderWeeklyDays',
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysElementEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'reminderWeeklyDays',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysElementGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'reminderWeeklyDays',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysElementLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'reminderWeeklyDays',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysElementBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'reminderWeeklyDays',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'reminderWeeklyDays',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'reminderWeeklyDays',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'reminderWeeklyDays',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'reminderWeeklyDays',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'reminderWeeklyDays',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterFilterCondition>
+      reminderWeeklyDaysLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'reminderWeeklyDays',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
   QueryBuilder<Mission, Mission, QAfterFilterCondition> titleEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -868,6 +1378,30 @@ extension MissionQuerySortBy on QueryBuilder<Mission, Mission, QSortBy> {
     });
   }
 
+  QueryBuilder<Mission, Mission, QAfterSortBy> sortByReminderRepeatMode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderRepeatMode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterSortBy> sortByReminderRepeatModeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderRepeatMode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterSortBy> sortByReminderTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderTime', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterSortBy> sortByReminderTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderTime', Sort.desc);
+    });
+  }
+
   QueryBuilder<Mission, Mission, QAfterSortBy> sortByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
@@ -967,6 +1501,30 @@ extension MissionQuerySortThenBy
     });
   }
 
+  QueryBuilder<Mission, Mission, QAfterSortBy> thenByReminderRepeatMode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderRepeatMode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterSortBy> thenByReminderRepeatModeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderRepeatMode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterSortBy> thenByReminderTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderTime', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QAfterSortBy> thenByReminderTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderTime', Sort.desc);
+    });
+  }
+
   QueryBuilder<Mission, Mission, QAfterSortBy> thenByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
@@ -1031,6 +1589,27 @@ extension MissionQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Mission, Mission, QDistinct> distinctByReminderRepeatMode(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'reminderRepeatMode',
+          caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QDistinct> distinctByReminderTime(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'reminderTime', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Mission, Mission, QDistinct> distinctByReminderWeeklyDays() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'reminderWeeklyDays');
+    });
+  }
+
   QueryBuilder<Mission, Mission, QDistinct> distinctByTitle(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1080,6 +1659,26 @@ extension MissionQueryProperty
   QueryBuilder<Mission, int?, QQueryOperations> projectIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'projectId');
+    });
+  }
+
+  QueryBuilder<Mission, String?, QQueryOperations>
+      reminderRepeatModeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'reminderRepeatMode');
+    });
+  }
+
+  QueryBuilder<Mission, String?, QQueryOperations> reminderTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'reminderTime');
+    });
+  }
+
+  QueryBuilder<Mission, List<int>?, QQueryOperations>
+      reminderWeeklyDaysProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'reminderWeeklyDays');
     });
   }
 

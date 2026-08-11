@@ -6,7 +6,6 @@ import '../providers/missions_provider.dart';
 import '../../data/models/mission.dart';
 import '../../data/models/subtask.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/services/notification_service.dart';
 import '../../../../core/widgets/shake_widget.dart';
 
 class AddMissionScreen extends ConsumerStatefulWidget {
@@ -268,24 +267,13 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
         ..description = buffer.isEmpty ? null : buffer.toString().trim()
         ..type = _selectedType
         ..xpReward = _selectedType == MissionType.main ? 100 : (_selectedType == MissionType.side ? 50 : 20)
-        ..date = _startDate;
+        ..date = _startDate
+        ..reminderTime = _reminderTime != null ? '${_reminderTime!.hour.toString().padLeft(2, '0')}:${_reminderTime!.minute.toString().padLeft(2, '0')}' : null
+        ..reminderRepeatMode = _reminderTime != null ? actualRepeatMode : null
+        ..reminderWeeklyDays = _reminderTime != null && actualRepeatMode == 'Weekly' ? _selectedDays.toList() : null;
 
+      // updateMission -> _loadMissions -> syncMissionsToNotifications handles scheduling
       await ref.read(missionNotifierProvider.notifier).updateMission(mission);
-      if (_reminderTime != null) {
-        NotificationService.scheduleMissionNotification(
-          id: mission.id,
-          title: 'Ascent Reminder: ${mission.title}',
-          body: 'It is time to focus on your mission!',
-          scheduledDateTime: DateTime(
-            _startDate.year, _startDate.month, _startDate.day,
-            _reminderTime!.hour, _reminderTime!.minute,
-          ),
-          repeatMode: actualRepeatMode,
-          weeklyDays: _selectedDays.toList(),
-        );
-      } else {
-        NotificationService.cancelNotification(mission.id);
-      }
     } else {
       final mission = Mission()
         ..title = title
@@ -293,22 +281,13 @@ class _AddMissionScreenState extends ConsumerState<AddMissionScreen> {
         ..type = _selectedType
         ..xpReward = _selectedType == MissionType.main ? 100 : (_selectedType == MissionType.side ? 50 : 20)
         ..date = _startDate
+        ..reminderTime = _reminderTime != null ? '${_reminderTime!.hour.toString().padLeft(2, '0')}:${_reminderTime!.minute.toString().padLeft(2, '0')}' : null
+        ..reminderRepeatMode = _reminderTime != null ? actualRepeatMode : null
+        ..reminderWeeklyDays = _reminderTime != null && actualRepeatMode == 'Weekly' ? _selectedDays.toList() : null
         ..isCompleted = false;
 
+      // addMission -> _loadMissions -> syncMissionsToNotifications handles scheduling
       await ref.read(missionNotifierProvider.notifier).addMission(mission);
-      if (_reminderTime != null) {
-        NotificationService.scheduleMissionNotification(
-          id: mission.id,
-          title: 'Ascent Reminder: ${mission.title}',
-          body: 'It is time to focus on your mission!',
-          scheduledDateTime: DateTime(
-            _startDate.year, _startDate.month, _startDate.day,
-            _reminderTime!.hour, _reminderTime!.minute,
-          ),
-          repeatMode: actualRepeatMode,
-          weeklyDays: _selectedDays.toList(),
-        );
-      }
     }
     if (mounted) {
       Navigator.of(context).pop();

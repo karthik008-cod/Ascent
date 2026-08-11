@@ -13,9 +13,9 @@ extension GetTaskItemCollection on Isar {
   IsarCollection<TaskItem> get taskItems => this.collection();
 }
 
-final TaskItemSchema = CollectionSchema(
+const TaskItemSchema = CollectionSchema(
   name: r'TaskItem',
-  id: identical(0, 0.0) ? 21711804 : BigInt.parse('2171180427076855156').toInt(),
+  id: 2171180427076855156,
   properties: {
     r'createdAt': PropertySchema(
       id: 0,

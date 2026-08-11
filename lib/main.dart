@@ -6,9 +6,15 @@ import './core/services/notification_service.dart';
 import './features/profile/presentation/providers/theme_provider.dart';
 import './core/services/sync_service.dart';
 
+import 'dart:io';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.init();
+  if (Platform.isAndroid) {
+    await AndroidAlarmManager.initialize();
+  }
   runApp(const ProviderScope(child: AscentApp()));
 }
 

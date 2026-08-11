@@ -93,6 +93,9 @@ class MissionNotifier extends StateNotifier<AsyncValue<List<Mission>>> {
       }
       
       state = AsyncValue.data(activeMissions);
+      
+      // Sync all exact alarms for the next 14 days based on current missions
+      NotificationService.syncMissionsToNotifications(activeMissions);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -263,6 +266,9 @@ class MissionNotifier extends StateNotifier<AsyncValue<List<Mission>>> {
     } else {
       await ref.read(userStatsNotifierProvider.notifier).removeXp(mission.xpReward);
       await repository.saveMission(mission);
+      if (mission.reminderTime != null) {
+        await NotificationService.scheduleMissionNotification(mission: mission);
+      }
     }
     
     return event;

@@ -20,6 +20,12 @@ class Mission {
   int xpReward = 0;
   
   int? projectId;
+  
+  String? reminderTime; // e.g., "09:00"
+  
+  String? reminderRepeatMode; // "Once", "Daily", "Weekly"
+  
+  List<int>? reminderWeeklyDays;
 }
 
 enum MissionType {

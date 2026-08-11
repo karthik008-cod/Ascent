@@ -3,17 +3,15 @@ import 'package:timezone/timezone.dart' as tz;
 
 void main() {
   tz.initializeTimeZones();
-  tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
-
-  final localDateTime = DateTime(2026, 8, 5, 20, 52);
-  print('Local DateTime: $localDateTime');
-
-  final tzDateTime = tz.TZDateTime.from(localDateTime, tz.local);
-  print('TZDateTime: $tzDateTime');
+  tz.setLocalLocation(tz.getLocation('Asia/Kolkata')); // User's timezone likely IST
   
-  if (tzDateTime.isBefore(DateTime.now())) {
-    print('Is before now');
-  } else {
-    print('Is after now');
+  DateTime scheduledDateTime = DateTime.now().add(Duration(days: 1)); // Tomorrow
+  
+  for (int i = 0; i < 7; i++) {
+    var nextDay = scheduledDateTime.add(Duration(days: i));
+    if (nextDay.isBefore(DateTime.now())) {
+      nextDay = nextDay.add(const Duration(days: 1));
+    }
+    print("i=$i nextDay=$nextDay tz=${tz.TZDateTime.from(nextDay, tz.local)}");
   }
 }

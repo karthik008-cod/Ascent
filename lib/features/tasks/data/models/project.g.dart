@@ -13,9 +13,9 @@ extension GetProjectCollection on Isar {
   IsarCollection<Project> get projects => this.collection();
 }
 
-final ProjectSchema = CollectionSchema(
+const ProjectSchema = CollectionSchema(
   name: r'Project',
-  id: identical(0, 0.0) ? 33029996 : BigInt.parse('3302999628838485849').toInt(),
+  id: 3302999628838485849,
   properties: {
     r'createdAt': PropertySchema(
       id: 0,
