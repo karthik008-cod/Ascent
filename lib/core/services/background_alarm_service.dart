@@ -11,6 +11,9 @@ import '../../features/progress/data/models/user_stats.dart';
 
 class BackgroundAlarmService {
   /// Schedules the next native exact alarm for Android.
+  /// 
+  /// Key rule: NEVER schedule an alarm before mission.date (the start date).
+  /// This works like a real clock app — the start date is the floor.
   static Future<void> scheduleNextAlarm(Mission mission) async {
     if (mission.reminderTime == null || mission.isCompleted) return;
 
@@ -22,6 +25,9 @@ class BackgroundAlarmService {
     final now = DateTime.now();
     final repeatMode = mission.reminderRepeatMode ?? 'Once';
     final weeklyDays = mission.reminderWeeklyDays ?? [];
+    
+    // The start date is the absolute floor — no alarm before this date
+    final startDate = DateTime(mission.date.year, mission.date.month, mission.date.day);
 
     DateTime? nextAlarmTime;
 
@@ -38,20 +44,40 @@ class BackgroundAlarmService {
         return;
       }
     } else if (repeatMode == 'Daily' || repeatMode == 'Hourly (Nag)') {
-      // Find the next occurrence: today at that time, or tomorrow if today's time has passed
-      var candidate = DateTime(now.year, now.month, now.day, hour, minute);
-      if (candidate.isBefore(now) || candidate.isAtSameMomentAs(now)) {
+      // Start searching from the later of today or the mission start date
+      DateTime searchFrom;
+      if (now.isBefore(startDate)) {
+        // Mission hasn't started yet — first alarm is on the start date
+        searchFrom = startDate;
+      } else {
+        // Mission already started — search from today
+        searchFrom = DateTime(now.year, now.month, now.day);
+      }
+      
+      var candidate = DateTime(searchFrom.year, searchFrom.month, searchFrom.day, hour, minute);
+      // If this candidate is in the past (today's time already passed), move to next day
+      if (!candidate.isAfter(now)) {
         candidate = candidate.add(const Duration(days: 1));
       }
       nextAlarmTime = candidate;
     } else if (repeatMode == 'Weekly' && weeklyDays.isNotEmpty) {
-      // Find the next weekday in the list, starting from now
+      // Start searching from the later of today or the mission start date
+      DateTime searchFrom;
+      if (now.isBefore(startDate)) {
+        searchFrom = startDate;
+      } else {
+        searchFrom = DateTime(now.year, now.month, now.day);
+      }
+      
+      // Search up to 8 days to find the next matching weekday
       for (int i = 0; i < 8; i++) {
-        final candidate = DateTime(now.year, now.month, now.day, hour, minute)
-            .add(Duration(days: i));
-        // Skip today if the time has already passed
-        if (i == 0 && candidate.isBefore(now)) continue;
-        if (weeklyDays.contains(candidate.weekday)) {
+        final candidateDate = searchFrom.add(Duration(days: i));
+        final candidate = DateTime(
+          candidateDate.year, candidateDate.month, candidateDate.day,
+          hour, minute,
+        );
+        // Must be in the future AND on a matching weekday
+        if (candidate.isAfter(now) && weeklyDays.contains(candidate.weekday)) {
           nextAlarmTime = candidate;
           break;
         }
@@ -82,7 +108,7 @@ class BackgroundAlarmService {
     );
 
     debugPrint('[Ascent] Scheduled Android Alarm for Mission ${mission.id} '
-        '("${mission.title}") at $nextAlarmTime (repeat=$repeatMode)');
+        '("${mission.title}") at $nextAlarmTime (repeat=$repeatMode, startDate=$startDate)');
   }
 
   /// Cancels an existing Android alarm

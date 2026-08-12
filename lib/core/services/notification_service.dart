@@ -131,26 +131,33 @@ class NotificationService {
     final body = 'It is time to focus on your mission!';
 
     // Calculate dates to schedule (iOS only allows up to 64 local notifications total, we'll schedule a few)
+    // Key rule: NEVER schedule before mission.date (the start date)
+    final now = DateTime.now();
+    final startDate = DateTime(mission.date.year, mission.date.month, mission.date.day);
     List<DateTime> datesToSchedule = [];
     
     if (repeatMode == 'Once') {
-      if (scheduledDateTime.isAfter(DateTime.now())) {
+      if (scheduledDateTime.isAfter(now)) {
         datesToSchedule.add(scheduledDateTime);
       }
     } else if (repeatMode == 'Daily' || repeatMode == 'Hourly (Nag)') {
-      // Schedule for the next 14 occurrences
+      // Start from the later of today or the mission start date
+      final searchFrom = now.isBefore(startDate) ? startDate : DateTime(now.year, now.month, now.day);
       for (int i = 0; i < 60; i++) {
-        var nextDay = scheduledDateTime.add(Duration(days: i));
-        if (nextDay.isAfter(DateTime.now())) {
+        final nextDay = DateTime(searchFrom.year, searchFrom.month, searchFrom.day, hour, minute)
+            .add(Duration(days: i));
+        if (nextDay.isAfter(now)) {
           datesToSchedule.add(nextDay);
           if (datesToSchedule.length >= 14) break; 
         }
       }
     } else if (repeatMode == 'Weekly' && weeklyDays.isNotEmpty) {
-      // Schedule for the next 4 weeks (max 14 alarms total)
+      // Start from the later of today or the mission start date
+      final searchFrom = now.isBefore(startDate) ? startDate : DateTime(now.year, now.month, now.day);
       for (int i = 0; i < 60; i++) {
-        var nextDay = scheduledDateTime.add(Duration(days: i));
-        if (weeklyDays.contains(nextDay.weekday) && nextDay.isAfter(DateTime.now())) {
+        final nextDay = DateTime(searchFrom.year, searchFrom.month, searchFrom.day, hour, minute)
+            .add(Duration(days: i));
+        if (weeklyDays.contains(nextDay.weekday) && nextDay.isAfter(now)) {
           datesToSchedule.add(nextDay);
           if (datesToSchedule.length >= 14) break;
         }
