@@ -82,10 +82,17 @@ app.post('/api/send-otp', async (req, res) => {
       break;
   }
 
-  // Split OTP into individual digits for the styled display
+  // Split OTP into individual digits for the styled display.
+  // Using table cells instead of divs with line-height fixes alignment in Gmail.
   const otpDigits = otp.split('').map(d => 
     `<td style="padding: 0 4px;">
-      <div style="width: 44px; height: 56px; background: ${accentColor}; border-radius: 10px; font-size: 26px; font-weight: 700; color: #ffffff; line-height: 56px; text-align: center; font-family: 'SF Mono', 'Roboto Mono', Consolas, monospace;">${d}</div>
+      <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+          <td align="center" valign="middle" width="44" height="56" style="background-color: ${accentColor}; border-radius: 10px; font-size: 26px; font-weight: 700; color: #ffffff; font-family: 'SF Mono', 'Roboto Mono', Consolas, monospace;">
+            ${d}
+          </td>
+        </tr>
+      </table>
     </td>`
   ).join('');
   
@@ -124,10 +131,23 @@ app.post('/api/send-otp', async (req, res) => {
           
           <!-- OTP Code -->
           <tr>
-            <td align="center" style="padding: 0 40px 12px;">
+            <td align="center" style="padding: 0 40px 24px;">
               <table role="presentation" cellspacing="0" cellpadding="0">
                 <tr>
                   ${otpDigits}
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- App Deep Link Button -->
+          <tr>
+            <td align="center" style="padding: 0 40px 32px;">
+              <table role="presentation" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center" style="border-radius: 8px;" bgcolor="${accentColor}">
+                    <a href="ascent://auth?otp=${otp}" target="_blank" style="font-size: 16px; font-weight: bold; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 8px; padding: 14px 32px; border: 1px solid ${accentColor}; display: inline-block;">Open App & Apply Code</a>
+                  </td>
                 </tr>
               </table>
             </td>
