@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:app_links/app_links.dart';
 import '../providers/auth_provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/dynamic_loading_indicator.dart';
@@ -33,8 +35,57 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final _nameController = TextEditingController();
   final _otpController = TextEditingController();
 
+  // Deep link handling
+  late final AppLinks _appLinks;
+  StreamSubscription<Uri>? _deepLinkSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _appLinks = AppLinks();
+    _initDeepLinks();
+  }
+
+  Future<void> _initDeepLinks() async {
+    // Handle the initial deep link if the app was launched via one
+    try {
+      final initialLink = await _appLinks.getInitialLink();
+      if (initialLink != null) {
+        _handleDeepLink(initialLink);
+      }
+    } catch (_) {
+      // No initial link
+    }
+
+    // Listen for deep links while the app is running
+    _deepLinkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      _handleDeepLink(uri);
+    });
+  }
+
+  void _handleDeepLink(Uri uri) {
+    // Expected format: ascent://auth?otp=123456
+    if (uri.scheme == 'ascent' && uri.host == 'auth') {
+      final otp = uri.queryParameters['otp'];
+      if (otp != null && otp.length == 6) {
+        // Fill the OTP field
+        _otpController.text = otp;
+
+        // Auto-submit if the user is on an OTP step
+        if (_currentStep == AuthStep.otpVerification) {
+          _handleOtpSubmit();
+        } else if (_currentStep == AuthStep.forgotPasswordOtp) {
+          _handleForgotPasswordOtpSubmit();
+        }
+        // If the user hasn't reached the OTP step yet, the field
+        // is pre-filled and they'll see it when they get there.
+      }
+    }
+  }
+
   @override
   void dispose() {
+    _deepLinkSubscription?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();

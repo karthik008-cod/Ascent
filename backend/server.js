@@ -82,20 +82,6 @@ app.post('/api/send-otp', async (req, res) => {
       break;
   }
 
-  // Split OTP into individual digits for the styled display.
-  // Using table cells instead of divs with line-height fixes alignment in Gmail.
-  const otpDigits = otp.split('').map(d => 
-    `<td style="padding: 0 4px;">
-      <table border="0" cellpadding="0" cellspacing="0" role="presentation">
-        <tr>
-          <td align="center" valign="middle" width="44" height="56" style="background-color: ${accentColor}; border-radius: 10px; font-size: 26px; font-weight: 700; color: #ffffff; font-family: 'SF Mono', 'Roboto Mono', Consolas, monospace;">
-            ${d}
-          </td>
-        </tr>
-      </table>
-    </td>`
-  ).join('');
-  
   const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -129,14 +115,19 @@ app.post('/api/send-otp', async (req, res) => {
             </td>
           </tr>
           
-          <!-- OTP Code -->
+          <!-- OTP Code as single selectable block -->
           <tr>
-            <td align="center" style="padding: 0 40px 24px;">
-              <table role="presentation" cellspacing="0" cellpadding="0">
-                <tr>
-                  ${otpDigits}
-                </tr>
-              </table>
+            <td align="center" style="padding: 0 40px 8px;">
+              <div style="background-color: ${accentColor}; border-radius: 12px; padding: 18px 32px; display: inline-block;">
+                <span style="font-size: 34px; font-weight: 800; color: #ffffff; letter-spacing: 12px; font-family: 'SF Mono', 'Roboto Mono', Consolas, monospace;">${otp}</span>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Tap to copy hint -->
+          <tr>
+            <td align="center" style="padding: 4px 40px 24px;">
+              <p style="margin: 0; font-size: 12px; color: #6B7280;">Long-press the code above to select &amp; copy</p>
             </td>
           </tr>
           
@@ -145,8 +136,8 @@ app.post('/api/send-otp', async (req, res) => {
             <td align="center" style="padding: 0 40px 32px;">
               <table role="presentation" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td align="center" style="border-radius: 8px;" bgcolor="${accentColor}">
-                    <a href="ascent://auth?otp=${otp}" target="_blank" style="font-size: 16px; font-weight: bold; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 8px; padding: 14px 32px; border: 1px solid ${accentColor}; display: inline-block;">Open App & Apply Code</a>
+                  <td align="center" style="border-radius: 8px; border: 2px solid ${accentColor};">
+                    <a href="ascent://auth?otp=${otp}" target="_blank" style="font-size: 15px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: ${accentColor}; text-decoration: none; border-radius: 6px; padding: 12px 28px; display: inline-block;">Open App &amp; Apply Code →</a>
                   </td>
                 </tr>
               </table>
