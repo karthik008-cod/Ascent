@@ -70,7 +70,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         setState(() => _currentStep = AuthStep.methodSelection);
       } else {
         // New User -> Must use OTP
-        final sent = await ref.read(authNotifierProvider.notifier).sendOtp(email);
+        final sent = await ref.read(authNotifierProvider.notifier).sendOtp(email, purpose: 'registration');
         if (sent) {
           setState(() => _currentStep = AuthStep.otpVerification);
         } else {
@@ -370,7 +370,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               _errorMessage = null;
               _isOtpLoading = true;
             });
-            final sent = await ref.read(authNotifierProvider.notifier).sendOtp(_emailController.text.trim());
+            final sent = await ref.read(authNotifierProvider.notifier).sendOtp(_emailController.text.trim(), purpose: 'login');
             if (mounted) setState(() => _isOtpLoading = false);
             if (sent) {
               setState(() => _currentStep = AuthStep.otpVerification);
@@ -426,7 +426,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           child: TextButton(
             onPressed: _isForgotLoading ? null : () async {
               setState(() => _isForgotLoading = true);
-              final sent = await ref.read(authNotifierProvider.notifier).sendOtp(_emailController.text.trim());
+              final sent = await ref.read(authNotifierProvider.notifier).sendOtp(_emailController.text.trim(), purpose: 'password_reset');
               if (mounted) setState(() => _isForgotLoading = false);
               if (sent) {
                 _otpController.clear();

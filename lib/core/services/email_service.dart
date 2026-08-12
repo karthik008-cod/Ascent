@@ -9,7 +9,13 @@ class EmailService {
     defaultValue: 'https://ascent-1-7wj7.onrender.com/api/send-otp'
   );
 
-  static Future<bool> sendOtpEmail(String recipientEmail, String otp) async {
+  /// Sends an OTP email with context-aware content.
+  /// 
+  /// [purpose] controls the email template:
+  /// - 'registration' — New user sign-up verification
+  /// - 'login' — Existing user OTP sign-in
+  /// - 'password_reset' — Forgot password flow
+  static Future<bool> sendOtpEmail(String recipientEmail, String otp, {String purpose = 'login'}) async {
     try {
       final response = await http.post(
         Uri.parse(_apiUrl),
@@ -17,11 +23,12 @@ class EmailService {
         body: jsonEncode({
           'email': recipientEmail,
           'otp': otp,
+          'purpose': purpose,
         }),
       );
 
       if (response.statusCode == 200) {
-        debugPrint('OTP email sent successfully via backend.');
+        debugPrint('OTP email sent successfully via backend (purpose: $purpose).');
         return true;
       } else {
         debugPrint('Backend failed to send OTP. Status code: ${response.statusCode}');

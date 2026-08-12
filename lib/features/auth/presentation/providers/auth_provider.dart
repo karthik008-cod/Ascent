@@ -300,7 +300,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
     return await mongo.checkUserExists(email);
   }
 
-  Future<bool> sendOtp(String email) async {
+  Future<bool> sendOtp(String email, {String purpose = 'login'}) async {
     // Generate a 6-digit random OTP
     final random = _math.Random();
     final otp = (100000 + random.nextInt(900000)).toString();
@@ -310,9 +310,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthUser?>> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('temp_otp_$email', otp);
     
-    // Call EmailService
-    // Note: We need to import email_service.dart and dart:math at the top
-    final success = await EmailService.sendOtpEmail(email, otp);
+    // Call EmailService with the purpose
+    final success = await EmailService.sendOtpEmail(email, otp, purpose: purpose);
     return success;
   }
   
